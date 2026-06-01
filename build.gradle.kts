@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.github.afeibaili"
-version = "0.0.1"
+version = properties["version"] as String
 val mavenPackageName = "wrapgl"
 
 val lwjglVersion = "3.3.6"
