@@ -34,6 +34,11 @@ class Window(
     companion object {
         fun builder() = WindowBuilder()
     }
+
+    override fun toString(): String {
+        return "Window(width=$width, height=$height, title='$title', windowLocation=$windowLocation)"
+    }
+
 }
 
 class WindowBuilder() {
@@ -44,7 +49,7 @@ class WindowBuilder() {
     var blocks = mutableListOf<() -> Unit>()
 
     fun build(): Window {
-        if (isInitialised) glfwInit()
+        if (!isInitialised) glfwInit()
         val window: Long = glfwCreateWindow(width, height, title, 0, 0)
         glfwSwapInterval(if (verticalSync) 1 else 0)
 

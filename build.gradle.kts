@@ -5,7 +5,7 @@ plugins {
 
 group = "cn.afeibaili.gl"
 version = properties["version"] as String
-val mavenPackageName = "wrapgl"
+val mavenPackageName = "engine2d"
 
 val lwjglVersion = "3.3.6"
 val jomlVersion = "1.10.8"
@@ -57,7 +57,7 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/afeibaili/wrapgl")
+            url = uri("https://maven.pkg.github.com/afeibaili/engine2d")
             credentials {
                 username = System.getenv("GITHUB_ACCOUNT")
                 password = System.getenv("GITHUB_TOKEN")
