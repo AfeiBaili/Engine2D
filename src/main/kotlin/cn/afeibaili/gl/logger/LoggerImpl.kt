@@ -1,6 +1,7 @@
 package cn.afeibaili.gl.logger
 
 import cn.afeibaili.gl.logger.Logger.Companion.printDebug
+import cn.afeibaili.gl.logger.Logger.Companion.writeFile
 import kotlinx.coroutines.*
 import java.io.FileWriter
 import java.io.PrintWriter
@@ -37,7 +38,7 @@ internal class LoggerImpl(override val name: String) : Logger {
     private fun print(level: String, msg: Any, printer: PrintWriter = outPrinter) {
         val log = "[$level] ${getDate(formatter)} $name: $msg"
         loggerScope.launch { printer.println(log) }
-        loggerScope.launch { filePrinter.println(log) }
+        if (writeFile) loggerScope.launch { filePrinter.println(log) }
     }
 
 
