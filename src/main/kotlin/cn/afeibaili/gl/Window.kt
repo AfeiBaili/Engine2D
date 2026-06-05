@@ -1,6 +1,7 @@
 package cn.afeibaili.gl
 
 import org.lwjgl.glfw.GLFW.*
+import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL45C
 import java.io.Closeable
 
@@ -53,8 +54,13 @@ class WindowBuilder() {
     var clearColor = floatArrayOf(1f, 1f, 1f, 1f)
 
     fun build(): Window {
-        if (!isInitialised) glfwInit()
+        if (!isInitialised) {
+            glfwInit()
+        }
         val window: Long = glfwCreateWindow(width, height, title, 0, 0)
+        glfwMakeContextCurrent(window)
+        GL.createCapabilities()
+
         glfwSwapInterval(if (verticalSync) 1 else 0)
 
         blocks.forEach { it() }

@@ -71,7 +71,16 @@ class TextureAtlas(val atlas: List<Atlas>) {
                     nameMap[name] = currentX to currentY
                 }
                 atlasBufferImage.graphics.dispose()
-                atlases.add(Atlas(atlasBufferImage, nameMap, Size(images.size), side, Side(atlasSide)))
+                atlases.add(
+                    Atlas(
+                        atlasBufferImage,
+                        nameMap,
+                        Size(images.size),
+                        side,
+                        Side(atlasSide),
+                        Texture(atlasBufferImage)
+                    )
+                )
                 val atlasSize = "${atlasSide}x$atlasSide"
 
                 val writeFile = File("${System.getProperty("user.dir")}/temp/$name-$atlasSize.png")
@@ -95,5 +104,6 @@ class TextureAtlas(val atlas: List<Atlas>) {
         val size: Size,
         val imageSide: Side,
         val atlasSide: Side,
+        val texture: Texture,
     )
 }
