@@ -1,6 +1,7 @@
 package cn.afeibaili.gl
 
 import org.lwjgl.glfw.GLFW.*
+import org.lwjgl.opengl.GL45C
 import java.io.Closeable
 
 
@@ -16,6 +17,7 @@ class Window(
     var height: Int,
     var title: String,
     val windowLocation: Long,
+    val clearColor: FloatArray,
 ) : Closeable {
 
     override fun close() {
@@ -25,6 +27,7 @@ class Window(
 
     inline fun frameRender(action: () -> Unit) {
         while (!glfwWindowShouldClose(windowLocation)) {
+            GL45C.glClearBufferfv(GL45C.GL_COLOR, 0, clearColor)
             action()
             glfwSwapBuffers(windowLocation)
             glfwPollEvents()
@@ -47,6 +50,7 @@ class WindowBuilder() {
     var title = "Hello GL"
     var verticalSync = false
     var blocks = mutableListOf<() -> Unit>()
+    var clearColor = floatArrayOf(1f, 1f, 1f, 1f)
 
     fun build(): Window {
         if (!isInitialised) glfwInit()
@@ -56,7 +60,7 @@ class WindowBuilder() {
         blocks.forEach { it() }
 
         isInitialised = true
-        return Window(width, height, title, window)
+        return Window(width, height, title, window, clearColor)
     }
 
     fun withCustomBlock(block: () -> Unit): WindowBuilder {
@@ -66,6 +70,11 @@ class WindowBuilder() {
 
     fun withVerticalSync(boolean: Boolean): WindowBuilder {
         verticalSync = boolean
+        return this
+    }
+
+    fun withClearColor(red: Float, green: Float, blue: Float, alpha: Float): WindowBuilder {
+        clearColor = floatArrayOf(red, green, blue, alpha)
         return this
     }
 
