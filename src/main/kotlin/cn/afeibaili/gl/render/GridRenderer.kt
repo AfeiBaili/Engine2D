@@ -1,5 +1,6 @@
 package cn.afeibaili.gl.render
 
+import cn.afeibaili.gl.exception.MemoryException
 import cn.afeibaili.gl.render.shader.Program
 import org.lwjgl.opengl.GL15C.glDeleteBuffers
 import org.lwjgl.opengl.GL30C.glDeleteVertexArrays
@@ -77,13 +78,13 @@ class GridRenderer(val program: Program, val blockSize: Int = 1024) : Renderable
 
     companion object {
         val vertices = floatArrayOf(
-            0f, 0f,
-            1f, 0f,
-            0f, 1f,
+            -1f, -1f,
+            1f, -1f,
+            -1f, 1f,
 
-            1f, 0f,
+            1f, -1f,
             1f, 1f,
-            0f, 1f,
+            -1f, 1f,
         )
     }
 }
