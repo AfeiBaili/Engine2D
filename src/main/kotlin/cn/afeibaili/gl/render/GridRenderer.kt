@@ -20,8 +20,11 @@ class GridRenderer(val program: Program, val blockSize: Int = 1024) : Renderable
     val vao: Int = glCreateVertexArrays()
     val uvSize = 4
     val verticesVbo: Int = glCreateBuffers()
-    val mapVbo = glCreateBuffers()
-    val mapMemory: ByteBuffer
+    val instanceVbo: Int = glCreateBuffers()
+    val uvVbo = glCreateBuffers()
+
+    val uvMapMemory: ByteBuffer
+    val instanceMapMemory: ByteBuffer
 
     init {
         glNamedBufferStorage(verticesVbo, vertices, 0)
@@ -30,19 +33,33 @@ class GridRenderer(val program: Program, val blockSize: Int = 1024) : Renderable
         glVertexArrayAttribBinding(vao, 0, 0)
         glEnableVertexArrayAttrib(vao, 0)
 
-        glNamedBufferStorage(mapVbo, blockSize.toLong() * Float.SIZE_BYTES, GL_DYNAMIC_STORAGE_BIT or GL_MAP_WRITE_BIT)
-        glVertexArrayVertexBuffer(vao, 1, mapVbo, 0, uvSize * Float.SIZE_BYTES)
-        glVertexArrayAttribFormat(vao, 1, uvSize, GL_FLOAT, false, 0)
+        glNamedBufferStorage(instanceVbo, blockSize.toLong() * Float.SIZE_BYTES, GL_DYNAMIC_STORAGE_BIT)
+        glVertexArrayVertexBuffer(vao, 1, instanceVbo, 0, uvSize * Float.SIZE_BYTES)
+        glVertexArrayAttribFormat(vao, 1, 2, GL_FLOAT, false, 0)
         glVertexArrayAttribBinding(vao, 1, 1)
         glEnableVertexArrayAttrib(vao, 1)
         glVertexArrayBindingDivisor(vao, 1, 1)
-        mapMemory = glMapNamedBuffer(mapVbo, GL_WRITE_ONLY)
+
+        glNamedBufferStorage(uvVbo, blockSize.toLong() * Float.SIZE_BYTES, GL_DYNAMIC_STORAGE_BIT or GL_MAP_WRITE_BIT)
+        glVertexArrayVertexBuffer(vao, 2, uvVbo, 0, uvSize * Float.SIZE_BYTES)
+        glVertexArrayAttribFormat(vao, 2, uvSize, GL_FLOAT, false, 0)
+        glVertexArrayAttribBinding(vao, 2, 2)
+        glEnableVertexArrayAttrib(vao, 2)
+        glVertexArrayBindingDivisor(vao, 2, 1)
+
+        uvMapMemory = glMapNamedBuffer(uvVbo, GL_WRITE_ONLY)
+            ?: throw MemoryException("无法获取映射内存")
+        instanceMapMemory = glMapNamedBuffer(instanceVbo, GL_WRITE_ONLY)
             ?: throw MemoryException("无法获取映射内存")
     }
 
-    fun renderGrid(instanceSize: Int, updateData: ByteBuffer.() -> Unit) {
-        mapMemory.clear()
-        updateData(mapMemory)
+    fun renderGrid(updateInstanceData: ByteBuffer.() -> Unit, updateUvData: ByteBuffer.() -> Unit, instanceSize: Int) {
+        uvMapMemory.clear()
+        instanceMapMemory.clear()
+
+        updateInstanceData(instanceMapMemory)
+        updateUvData(uvMapMemory)
+
         glBindVertexArray(vao)
         program.use()
         glDrawArraysInstanced(GL_TRIANGLES, 0, 6, instanceSize)
@@ -51,9 +68,9 @@ class GridRenderer(val program: Program, val blockSize: Int = 1024) : Renderable
     }
 
     override fun close() {
-        glUnmapNamedBuffer(mapVbo)
+        glUnmapNamedBuffer(uvVbo)
         glDeleteVertexArrays(vao)
-        glDeleteBuffers(mapVbo)
+        glDeleteBuffers(uvVbo)
         glDeleteBuffers(verticesVbo)
     }
 
