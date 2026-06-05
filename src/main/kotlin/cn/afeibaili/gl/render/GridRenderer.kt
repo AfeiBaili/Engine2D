@@ -60,8 +60,8 @@ class GridRenderer(val program: Program, val blockSize: Int = 1024) : Renderable
         updateInstanceData(instanceMapMemory)
         updateUvData(uvMapMemory)
 
-        glBindVertexArray(vao)
         program.use()
+        glBindVertexArray(vao)
         glDrawArraysInstanced(GL_TRIANGLES, 0, 6, instanceSize)
 
         glBindVertexArray(0)
