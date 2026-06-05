@@ -33,14 +33,20 @@ class GridRenderer(val program: Program, val blockSize: Int = 1024) : Renderable
         glVertexArrayAttribBinding(vao, 0, 0)
         glEnableVertexArrayAttrib(vao, 0)
 
-        glNamedBufferStorage(instanceVbo, blockSize.toLong() * Float.SIZE_BYTES, GL_DYNAMIC_STORAGE_BIT)
+        glNamedBufferStorage(
+            instanceVbo, blockSize.toLong() * Float.SIZE_BYTES,
+            GL_DYNAMIC_STORAGE_BIT or GL_MAP_WRITE_BIT
+        )
         glVertexArrayVertexBuffer(vao, 1, instanceVbo, 0, uvSize * Float.SIZE_BYTES)
         glVertexArrayAttribFormat(vao, 1, 2, GL_FLOAT, false, 0)
         glVertexArrayAttribBinding(vao, 1, 1)
         glEnableVertexArrayAttrib(vao, 1)
         glVertexArrayBindingDivisor(vao, 1, 1)
 
-        glNamedBufferStorage(uvVbo, blockSize.toLong() * Float.SIZE_BYTES, GL_DYNAMIC_STORAGE_BIT or GL_MAP_WRITE_BIT)
+        glNamedBufferStorage(
+            uvVbo, blockSize.toLong() * Float.SIZE_BYTES,
+            GL_DYNAMIC_STORAGE_BIT or GL_MAP_WRITE_BIT
+        )
         glVertexArrayVertexBuffer(vao, 2, uvVbo, 0, uvSize * Float.SIZE_BYTES)
         glVertexArrayAttribFormat(vao, 2, uvSize, GL_FLOAT, false, 0)
         glVertexArrayAttribBinding(vao, 2, 2)
