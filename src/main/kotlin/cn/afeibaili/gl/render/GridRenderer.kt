@@ -1,5 +1,13 @@
 package cn.afeibaili.gl.render
 
+import cn.afeibaili.gl.exception.MemoryException
+import cn.afeibaili.gl.render.shader.Program
+import org.lwjgl.opengl.GL15C.glDeleteBuffers
+import org.lwjgl.opengl.GL30C.glDeleteVertexArrays
+import org.lwjgl.opengl.GL45C.*
+import java.io.Closeable
+import java.nio.ByteBuffer
+
 
 /**
  * # 网格渲染器
@@ -8,6 +16,56 @@ package cn.afeibaili.gl.render
  * @version 2026/6/3 21:47
  */
 
-class GridRenderer : Renderable {
+class GridRenderer(val program: Program, val blockSize: Int = 1024) : Renderable, Closeable {
+    val vao: Int = glCreateVertexArrays()
+    val uvSize = 4
+    val verticesVbo: Int = glCreateBuffers()
+    val mapVbo = glCreateBuffers()
+    val mapMemory: ByteBuffer
 
+    init {
+        glNamedBufferStorage(verticesVbo, vertices, 0)
+        glVertexArrayVertexBuffer(vao, 0, verticesVbo, 0, 2 * Float.SIZE_BYTES)
+        glVertexArrayAttribFormat(vao, 0, 2, GL_FLOAT, false, 0)
+        glVertexArrayAttribBinding(vao, 0, 0)
+        glEnableVertexArrayAttrib(vao, 0)
+
+        glNamedBufferStorage(mapVbo, blockSize.toLong() * Float.SIZE_BYTES, GL_DYNAMIC_STORAGE_BIT or GL_MAP_WRITE_BIT)
+        glVertexArrayVertexBuffer(vao, 1, mapVbo, 0, uvSize * Float.SIZE_BYTES)
+        glVertexArrayAttribFormat(vao, 1, uvSize, GL_FLOAT, false, 0)
+        glVertexArrayAttribBinding(vao, 1, 1)
+        glEnableVertexArrayAttrib(vao, 1)
+        glVertexArrayBindingDivisor(vao, 1, 1)
+        mapMemory = glMapNamedBuffer(mapVbo, GL_WRITE_ONLY)
+            ?: throw MemoryException("无法获取映射内存")
+    }
+
+    fun renderGrid(instanceSize: Int, updateData: ByteBuffer.() -> Unit) {
+        mapMemory.clear()
+        updateData(mapMemory)
+        glBindVertexArray(vao)
+        program.use()
+        glDrawArraysInstanced(GL_TRIANGLES, 0, 6, instanceSize)
+
+        glBindVertexArray(0)
+    }
+
+    override fun close() {
+        glUnmapNamedBuffer(mapVbo)
+        glDeleteVertexArrays(vao)
+        glDeleteBuffers(mapVbo)
+        glDeleteBuffers(verticesVbo)
+    }
+
+    companion object {
+        val vertices = floatArrayOf(
+            -1f, -1f,
+            1f, -1f,
+            -1f, 1f,
+
+            1f, -1f,
+            1f, 1f,
+            -1f, 1f,
+        )
+    }
 }
