@@ -23,9 +23,6 @@ class GridRenderer(val program: Program, val blockSize: Int = 1024) : Renderable
     val instanceVbo: Int = glCreateBuffers()
     val uvVbo = glCreateBuffers()
 
-    val uvMapMemory: ByteBuffer
-    val instanceMapMemory: ByteBuffer
-
     init {
         glNamedBufferStorage(verticesVbo, vertices, 0)
         glVertexArrayVertexBuffer(vao, 0, verticesVbo, 0, 2 * Float.SIZE_BYTES)
@@ -34,7 +31,7 @@ class GridRenderer(val program: Program, val blockSize: Int = 1024) : Renderable
         glEnableVertexArrayAttrib(vao, 0)
 
         glNamedBufferStorage(
-            instanceVbo, blockSize.toLong() * Float.SIZE_BYTES,
+            instanceVbo, blockSize.toLong() * 2 * Float.SIZE_BYTES,
             GL_DYNAMIC_STORAGE_BIT or GL_MAP_WRITE_BIT
         )
         glVertexArrayVertexBuffer(vao, 1, instanceVbo, 0, uvSize * Float.SIZE_BYTES)
@@ -44,7 +41,7 @@ class GridRenderer(val program: Program, val blockSize: Int = 1024) : Renderable
         glVertexArrayBindingDivisor(vao, 1, 1)
 
         glNamedBufferStorage(
-            uvVbo, blockSize.toLong() * Float.SIZE_BYTES,
+            uvVbo, blockSize.toLong() * uvSize * Float.SIZE_BYTES,
             GL_DYNAMIC_STORAGE_BIT or GL_MAP_WRITE_BIT
         )
         glVertexArrayVertexBuffer(vao, 2, uvVbo, 0, uvSize * Float.SIZE_BYTES)
@@ -52,24 +49,23 @@ class GridRenderer(val program: Program, val blockSize: Int = 1024) : Renderable
         glVertexArrayAttribBinding(vao, 2, 2)
         glEnableVertexArrayAttrib(vao, 2)
         glVertexArrayBindingDivisor(vao, 2, 1)
-
-        uvMapMemory = glMapNamedBuffer(uvVbo, GL_WRITE_ONLY)
-            ?: throw MemoryException("无法获取映射内存")
-        instanceMapMemory = glMapNamedBuffer(instanceVbo, GL_WRITE_ONLY)
-            ?: throw MemoryException("无法获取映射内存")
     }
 
     fun renderGrid(updateInstanceData: ByteBuffer.() -> Unit, updateUvData: ByteBuffer.() -> Unit, instanceSize: Int) {
-        uvMapMemory.clear()
-        instanceMapMemory.clear()
+        val instanceMem = glMapNamedBuffer(instanceVbo, GL_WRITE_ONLY) ?: return
+        val uvMem = glMapNamedBuffer(uvVbo, GL_WRITE_ONLY) ?: return
+        uvMem.clear()
+        instanceMem.clear()
 
-        updateInstanceData(instanceMapMemory)
-        updateUvData(uvMapMemory)
+        updateInstanceData(instanceMem)
+        updateUvData(uvMem)
+
+        glUnmapNamedBuffer(instanceVbo)
+        glUnmapNamedBuffer(uvVbo)
 
         program.use()
         glBindVertexArray(vao)
         glDrawArraysInstanced(GL_TRIANGLES, 0, 6, instanceSize)
-
         glBindVertexArray(0)
     }
 
