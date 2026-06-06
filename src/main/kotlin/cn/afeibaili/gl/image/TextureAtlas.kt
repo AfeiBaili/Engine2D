@@ -21,7 +21,7 @@ class TextureAtlas(val atlas: List<Atlas>) {
 
     fun getUv(id: String, outUv: FloatArray) {
         if (outUv.size != 4) throw ArrayException("UV数组大小不为4")
-        val atlas: Atlas = getAtlas(id) ?: throw ImageException("图集为空，id不正确")
+        val atlas: Atlas = getAtlas(id) ?: throw ImageException("图集为空，id不正确: $id")
         val (x, y) = atlas.nameMap[id]!!
 
         val atlasSideF = atlas.atlasSide.value.toFloat()

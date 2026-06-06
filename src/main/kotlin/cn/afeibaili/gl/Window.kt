@@ -2,7 +2,6 @@ package cn.afeibaili.gl
 
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.GL
-import org.lwjgl.opengl.GL11C.GL_SRC_ALPHA
 import org.lwjgl.opengl.GL45
 import org.lwjgl.opengl.GL45C
 import java.io.Closeable
@@ -54,6 +53,7 @@ class WindowBuilder() {
     var verticalSync = false
     var blocks = mutableListOf<() -> Unit>()
     var clearColor = floatArrayOf(1f, 1f, 1f, 1f)
+    var enableViewport = false
 
     fun build(): Window {
         if (!isInitialised) {
@@ -69,8 +69,16 @@ class WindowBuilder() {
 
         blocks.forEach { it() }
 
+        if (enableViewport)
+            glfwSetWindowSizeCallback(window) { _, w, h -> GL45C.glViewport(0, 0, w, h) }
+
         isInitialised = true
         return Window(width, height, title, window, clearColor)
+    }
+
+    fun withViewport(boolean: Boolean): WindowBuilder {
+        enableViewport = boolean
+        return this
     }
 
     fun withCustomBlock(block: () -> Unit): WindowBuilder {
