@@ -31,7 +31,7 @@ class Camera(val projectionName: String, val viewName: String) {
     }
 
     fun ortho(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float): Camera {
-        projection.ortho(left, right, bottom, top, near, far)
+        projection.setOrtho(left, right, bottom, top, near, far)
         return this
     }
 
