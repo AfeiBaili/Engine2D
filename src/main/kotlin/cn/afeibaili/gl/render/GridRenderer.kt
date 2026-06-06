@@ -1,7 +1,7 @@
 package cn.afeibaili.gl.render
 
-import cn.afeibaili.gl.exception.MemoryException
 import cn.afeibaili.gl.render.shader.Program
+import cn.afeibaili.gl.render.camera.Camera
 import org.lwjgl.opengl.GL15C.glDeleteBuffers
 import org.lwjgl.opengl.GL30C.glDeleteVertexArrays
 import org.lwjgl.opengl.GL45C.*
@@ -16,7 +16,7 @@ import java.nio.ByteBuffer
  * @version 2026/6/3 21:47
  */
 
-class GridRenderer(val program: Program, val blockSize: Int = 1024) : Renderable, Closeable {
+class GridRenderer(val program: Program, val camera: Camera, val blockSize: Int = 1024) : Renderable, Closeable {
     val vao: Int = glCreateVertexArrays()
     val uvSize = 4
     val verticesVbo: Int = glCreateBuffers()
@@ -54,6 +54,7 @@ class GridRenderer(val program: Program, val blockSize: Int = 1024) : Renderable
     fun renderGrid(updateInstanceData: ByteBuffer.() -> Unit, updateUvData: ByteBuffer.() -> Unit, instanceSize: Int) {
         val instanceMem = glMapNamedBuffer(instanceVbo, GL_WRITE_ONLY) ?: return
         val uvMem = glMapNamedBuffer(uvVbo, GL_WRITE_ONLY) ?: return
+
         uvMem.clear()
         instanceMem.clear()
 
@@ -78,13 +79,13 @@ class GridRenderer(val program: Program, val blockSize: Int = 1024) : Renderable
 
     companion object {
         val vertices = floatArrayOf(
-            -1f, -1f,
-            1f, -1f,
-            -1f, 1f,
+            0f, 0f,
+            1f, 0f,
+            0f, 1f,
 
-            1f, -1f,
+            1f, 0f,
             1f, 1f,
-            -1f, 1f,
+            0f, 1f,
         )
     }
 }
