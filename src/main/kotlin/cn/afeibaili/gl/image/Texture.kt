@@ -15,7 +15,7 @@ import java.nio.ByteBuffer
  */
 
 class Texture(val bufferedImage: BufferedImage) : Closeable {
-    val textureLocation: Int = glCreateTextures(GL_TEXTURE_2D)
+    var textureLocation: Int = 0
     val data: ByteBuffer =
         MemoryUtil.memAlloc(bufferedImage.width * bufferedImage.height * Float.SIZE_BYTES)
     val width: Int = bufferedImage.width
@@ -24,6 +24,7 @@ class Texture(val bufferedImage: BufferedImage) : Closeable {
 
 
     fun upload() {
+        textureLocation = glCreateTextures(GL_TEXTURE_2D)
         glTextureStorage2D(textureLocation, 1, GL_RGBA8, bufferedImage.width, bufferedImage.height)
         glTextureParameteri(textureLocation, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
         glTextureParameteri(textureLocation, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
