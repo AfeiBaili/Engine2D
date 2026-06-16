@@ -1,7 +1,7 @@
 package cn.afeibaili.gl.render
 
-import cn.afeibaili.gl.render.shader.Program
 import cn.afeibaili.gl.render.camera.Camera
+import cn.afeibaili.gl.render.shader.Program
 import org.lwjgl.opengl.GL15C.glDeleteBuffers
 import org.lwjgl.opengl.GL30C.glDeleteVertexArrays
 import org.lwjgl.opengl.GL45C.*
@@ -51,7 +51,7 @@ class GridRenderer(val program: Program, val camera: Camera, val blockSize: Int 
         glVertexArrayBindingDivisor(vao, 2, 1)
     }
 
-    fun renderGrid(updateInstanceData: ByteBuffer.() -> Unit, updateUvData: ByteBuffer.() -> Unit, instanceSize: Int) {
+    inline fun renderGrid(updateInstanceData: ByteBuffer.() -> Unit, updateUvData: ByteBuffer.() -> Unit, instanceSize: Int) {
         val instanceMem = glMapNamedBuffer(instanceVbo, GL_WRITE_ONLY) ?: return
         val uvMem = glMapNamedBuffer(uvVbo, GL_WRITE_ONLY) ?: return
 

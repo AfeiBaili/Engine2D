@@ -27,20 +27,26 @@ class TextureAtlas(val atlas: List<Atlas>, val extendPixel: Int) {
      * @param uv 数组，长度需为4
      */
     fun getUv(id: String, outUv: FloatArray) {
-        //todo 修正如何获取uv
         if (outUv.size != 4) throw ArrayException("uv数组大小不为4")
         val atlas: Atlas = getAtlas(id) ?: throw ImageException("图集为空，id不正确: $id")
-        val (x, y) = atlas.nameMap[id]!!
+        val textureIndex = atlas.nameMap[id]!!
+        val size: Size = atlas.size
+
+        val index = textureIndex.value
+
+        val column = index % atlas.rowLenght
+        val row = index / atlas.rowLenght
+
+        val x = (column * atlas.imageSide.value) + extendPixel + (column * (extendPixel shl 1))
+        val y = (row * atlas.imageSide.value) + extendPixel + (row * (extendPixel shl 1))
 
         val atlasSide = atlas.atlasSide.value.toFloat()
         val imageSide = atlas.imageSide.value.toFloat()
 
-        val texelClamp = 0.5f
-
-        outUv[0] = (x.toFloat() + texelClamp) / atlasSide
-        outUv[1] = (atlasSide - (y.toFloat() + imageSide) + texelClamp) / atlasSide
-        outUv[2] = (x.toFloat() + imageSide - texelClamp) / atlasSide
-        outUv[3] = (atlasSide - y.toFloat() - texelClamp) / atlasSide
+        outUv[0] = x.toFloat() / atlasSide
+        outUv[1] = y.toFloat() / atlasSide
+        outUv[2] = (x.toFloat() + imageSide) / atlasSide
+        outUv[3] = (y.toFloat() + imageSide) / atlasSide
     }
 
     fun getAtlas(id: String): Atlas? = atlas.find { it.nameMap[id] != null }
@@ -91,7 +97,7 @@ class TextureAtlas(val atlas: List<Atlas>, val extendPixel: Int) {
                 val ceil = ceil(sqrt(images.size.toDouble())).toInt()
                 val atlasSide: Int = ceil * side.value + ceil * (extendPixel shl 1)
                 val atlasBufferImage = BufferedImage(atlasSide, atlasSide, BufferedImage.TYPE_INT_ARGB)
-                val nameMap = HashMap<String, Pair<Int, Int>>()
+                val nameMap = HashMap<String, Index>()
 
                 var currentX: Int
                 var currentY: Int
@@ -101,7 +107,7 @@ class TextureAtlas(val atlas: List<Atlas>, val extendPixel: Int) {
                     currentX = (index % ceil) * (side.value + (extendPixel shl 1))
                     currentY = (index / ceil) * (side.value + (extendPixel shl 1))
                     atlasBufferImage.graphics.drawImage(image, currentX, currentY, null)
-                    nameMap[name] = currentX to currentY
+                    nameMap[name] = Index(index)
                 }
                 atlasBufferImage.graphics.dispose()
                 atlases.add(
@@ -111,7 +117,8 @@ class TextureAtlas(val atlas: List<Atlas>, val extendPixel: Int) {
                         Size(images.size),
                         side,
                         Side(atlasSide),
-                        Texture(atlasBufferImage)
+                        Texture(atlasBufferImage),
+                        ceil
                     )
                 )
                 val atlasSize = "${atlasSide}x$atlasSide"
@@ -181,7 +188,7 @@ class TextureAtlas(val atlas: List<Atlas>, val extendPixel: Int) {
                 for (index in 0..finalImage.width - 1 - (currentSide shl 1))
                     finalImage.setRGB(
                         index + currentSide, bottomPoint,
-                        finalImage.getRGB(index + currentSide, rightSide)
+                        finalImage.getRGB(index + currentSide, bottomSide)
                     )
             }
 
@@ -197,12 +204,16 @@ class TextureAtlas(val atlas: List<Atlas>, val extendPixel: Int) {
 
     class PreProcessImage(val name: String, var bufferedImage: BufferedImage)
 
+    @JvmInline
+    value class Index(val value: Int)
+
     class Atlas(
         val image: BufferedImage,
-        val nameMap: Map<String, Pair<Int, Int>>,
+        val nameMap: Map<String, Index>,
         val size: Size,
         val imageSide: Side,
         val atlasSide: Side,
         val texture: Texture,
+        val rowLenght: Int,
     )
 }
