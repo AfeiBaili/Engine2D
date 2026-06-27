@@ -30,7 +30,6 @@ class TextureAtlas(val atlas: List<Atlas>, val extendPixel: Int) {
         if (outUv.size != 4) throw ArrayException("uv数组大小不为4")
         val atlas: Atlas = getAtlas(id) ?: throw ImageException("图集为空，id不正确: $id")
         val textureIndex = atlas.nameMap[id]!!
-        val size: Size = atlas.size
 
         val index = textureIndex.value
 

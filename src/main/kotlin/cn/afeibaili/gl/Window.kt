@@ -26,8 +26,8 @@ class Window(
         GL45C.glViewport(0, 0, width, height)
     }
 
-    inline fun frameRender(action: () -> Unit) {
-        while (!glfwWindowShouldClose(windowLocation)) {
+    inline fun frame(isActive: () -> Boolean, action: () -> Unit) {
+        while (isActive()) {
             GL45C.glClearBufferfv(GL45C.GL_COLOR, 0, clearColor)
             action()
             glfwSwapBuffers(windowLocation)

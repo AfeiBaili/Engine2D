@@ -11,7 +11,7 @@ import org.joml.Matrix4f
  * @version 2026/6/6 16:59
  */
 
-class Camera(val projectionName: String, val viewName: String) {
+class Camera(val program: Program, val projectionName: String, val viewName: String) {
     val projection: Matrix4f = Matrix4f().ortho(-5f, 5f, -5f, 5f, -1f, 1f)
     val view = Matrix4f()
 
@@ -20,7 +20,7 @@ class Camera(val projectionName: String, val viewName: String) {
         return this
     }
 
-    fun translate(x: Float, y: Float, z: Float): Camera {
+    fun translate(x: Float, y: Float, z: Float = 0f): Camera {
         view.translate(x, y, z)
         return this
     }
@@ -35,7 +35,7 @@ class Camera(val projectionName: String, val viewName: String) {
         return this
     }
 
-    fun apply(program: Program) {
+    fun apply() {
         uploadUniform(program, projectionName, viewName)
     }
 
