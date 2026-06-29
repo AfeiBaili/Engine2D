@@ -33,8 +33,8 @@ class TextureAtlas(val atlas: List<Atlas>, val extendPixel: Int) {
 
         val index = textureIndex.value
 
-        val column = index % atlas.rowLenght
-        val row = index / atlas.rowLenght
+        val column = index % atlas.rowLength
+        val row = index / atlas.rowLength
 
         val x = (column * atlas.imageSide.value) + extendPixel + (column * (extendPixel shl 1))
         val y = (row * atlas.imageSide.value) + extendPixel + (row * (extendPixel shl 1))
@@ -58,13 +58,26 @@ class TextureAtlas(val atlas: List<Atlas>, val extendPixel: Int) {
          *
          * 将文件列表的文件转换为一个大图
          *
-         * @param name 文件名（id）
+         * @param textureId 文件名（id）
          * @param imageFiles 文件列表
          * @param extendPixel 防止纹理“流血”的扩展像素，默认为1
          */
-        fun create(name: String, imageFiles: List<File>, extendPixel: Int = 1): TextureAtlas {
+        fun create(
+            textureId: String,
+            imageFiles: List<File>,
+            extendPixel: Int = 1,
+            vararg models: TextureModel,
+        ): TextureAtlas {
             //// 根据图片大小区分图集 ///////////////////////////
             val atlasMap = HashMap<Side, MutableList<PreProcessImage>>()  //根据图片大小分类图片
+
+            fun HashMap<Side, MutableList<PreProcessImage>>.addAndCheck(side: Side, id: String, image: BufferedImage) {
+                val images = this[side]
+                if (images != null) images.add(PreProcessImage(id, image))
+                else this[side] = mutableListOf(PreProcessImage(id, image))
+            }
+
+            // 文件图集
             imageFiles.forEach { file ->
                 val name = runCatching {
                     file.name.split(".").first()
@@ -78,11 +91,20 @@ class TextureAtlas(val atlas: List<Atlas>, val extendPixel: Int) {
                 val height: Int = readImageBuffer.height
                 if (width != height) throw ImageException("图片宽高不一致，请用正方形图片")
                 val side = Side(width)
-                val images = atlasMap[side]
 
-                if (images != null) images.add(PreProcessImage(name, readImageBuffer))
-                else atlasMap[side] = mutableListOf(PreProcessImage(name, readImageBuffer))
+                atlasMap.addAndCheck(side, name, readImageBuffer)
             }
+            // 自定义图集
+            models.forEach { model ->
+                val id: String = model.id
+                val width = model.image.width
+                val height = model.image.height
+                if (width != height) throw ImageException("图片宽高不一致，请用正方形图片")
+                val side = Side(width)
+
+                atlasMap.addAndCheck(side, id, model.image)
+            }
+
             //// 扩展图片 /////////////////////////////////////
             atlasMap.forEach { (side, images) ->
                 images.forEach { image ->
@@ -122,7 +144,7 @@ class TextureAtlas(val atlas: List<Atlas>, val extendPixel: Int) {
                 )
                 val atlasSize = "${atlasSide}x$atlasSide"
 
-                val writeFile = File("${System.getProperty("user.dir")}/temp/$name-$atlasSize.png")
+                val writeFile = File("${System.getProperty("user.dir")}/temp/$textureId-$atlasSize.png")
                 ImageIO.write(atlasBufferImage, "png", writeFile)
                 logger.info("make texture atlas, size: $atlasSize, size: ${images.size}")
             }
@@ -131,7 +153,7 @@ class TextureAtlas(val atlas: List<Atlas>, val extendPixel: Int) {
         }
 
         fun extendSide(sourceImage: BufferedImage, extendPixel: Int): BufferedImage {
-            val finalImage: BufferedImage = BufferedImage(
+            val finalImage = BufferedImage(
                 sourceImage.width + (extendPixel shl 1),
                 sourceImage.height + (extendPixel shl 1),
                 BufferedImage.TYPE_INT_ARGB
@@ -213,6 +235,6 @@ class TextureAtlas(val atlas: List<Atlas>, val extendPixel: Int) {
         val imageSide: Side,
         val atlasSide: Side,
         val texture: Texture,
-        val rowLenght: Int,
+        val rowLength: Int,
     )
 }

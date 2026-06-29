@@ -2,6 +2,7 @@ package cn.afeibaili.gl.render.camera
 
 import cn.afeibaili.gl.render.setUniform
 import cn.afeibaili.gl.render.shader.Program
+import org.joml.Math.lerp
 import org.joml.Matrix4f
 
 /**
@@ -22,6 +23,11 @@ class Camera(val program: Program, val projectionName: String, val viewName: Str
 
     fun translate(x: Float, y: Float, z: Float = 0f): Camera {
         view.translate(x, y, z)
+        return this
+    }
+
+    fun translation(x: Float, y: Float, z: Float = 0f): Camera {
+        view.translation(x, y, z)
         return this
     }
 

@@ -16,7 +16,7 @@ import java.nio.ByteBuffer
  * @version 2026/6/3 21:47
  */
 
-class GridRenderer(val program: Program, val camera: Camera, val blockSize: Int = 1024) : Renderable, Closeable {
+class GridRenderer(val program: Program, val camera: Camera, val blockSize: Int = 1024) : Closeable {
     val vao: Int = glCreateVertexArrays()
     val uvSize = 4
     val verticesVbo: Int = glCreateBuffers()
@@ -51,7 +51,11 @@ class GridRenderer(val program: Program, val camera: Camera, val blockSize: Int 
         glVertexArrayBindingDivisor(vao, 2, 1)
     }
 
-    inline fun renderGrid(updateInstanceData: ByteBuffer.() -> Unit, updateUvData: ByteBuffer.() -> Unit, instanceSize: Int) {
+    inline fun renderGrid(
+        updateInstanceData: ByteBuffer.() -> Unit,
+        updateUvData: ByteBuffer.() -> Unit,
+        instanceSize: Int,
+    ) {
         val instanceMem = glMapNamedBuffer(instanceVbo, GL_WRITE_ONLY) ?: return
         val uvMem = glMapNamedBuffer(uvVbo, GL_WRITE_ONLY) ?: return
 
