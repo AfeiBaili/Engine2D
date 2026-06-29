@@ -10,4 +10,10 @@ import java.awt.image.BufferedImage
  * @version 2026/6/29 21:36
  */
 
-class TextureModel(val id: String, val image: BufferedImage)
+class TextureModel(val id: String, val image: BufferedImage) {
+    companion object {
+        inline fun create(id: String, imageAction: () -> BufferedImage): TextureModel {
+            return TextureModel(id, imageAction())
+        }
+    }
+}

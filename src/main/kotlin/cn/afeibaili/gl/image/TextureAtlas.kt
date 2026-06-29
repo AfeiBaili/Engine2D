@@ -19,37 +19,6 @@ import kotlin.math.sqrt
  */
 
 class TextureAtlas(val atlas: List<Atlas>, val extendPixel: Int) {
-
-    /**
-     * 获取纹理UV坐标
-     *
-     * @param id 图片id
-     * @param uv 数组，长度需为4
-     */
-    fun getUv(id: String, outUv: FloatArray) {
-        if (outUv.size != 4) throw ArrayException("uv数组大小不为4")
-        val atlas: Atlas = getAtlas(id) ?: throw ImageException("图集为空，id不正确: $id")
-        val textureIndex = atlas.nameMap[id]!!
-
-        val index = textureIndex.value
-
-        val column = index % atlas.rowLength
-        val row = index / atlas.rowLength
-
-        val x = (column * atlas.imageSide.value) + extendPixel + (column * (extendPixel shl 1))
-        val y = (row * atlas.imageSide.value) + extendPixel + (row * (extendPixel shl 1))
-
-        val atlasSide = atlas.atlasSide.value.toFloat()
-        val imageSide = atlas.imageSide.value.toFloat()
-
-        outUv[0] = x.toFloat() / atlasSide
-        outUv[1] = y.toFloat() / atlasSide
-        outUv[2] = (x.toFloat() + imageSide) / atlasSide
-        outUv[3] = (y.toFloat() + imageSide) / atlasSide
-    }
-
-    fun getAtlas(id: String): Atlas? = atlas.find { it.nameMap[id] != null }
-
     companion object {
         private val logger = LoggerFactory.create("TextureAtlas")
 
@@ -61,6 +30,7 @@ class TextureAtlas(val atlas: List<Atlas>, val extendPixel: Int) {
          * @param textureId 文件名（id）
          * @param imageFiles 文件列表
          * @param extendPixel 防止纹理“流血”的扩展像素，默认为1
+         * @param models 自定义纹理
          */
         fun create(
             textureId: String,
@@ -188,34 +158,62 @@ class TextureAtlas(val atlas: List<Atlas>, val extendPixel: Int) {
                 finalImage.setRGB(rightPoint, bottomPoint, rightBottomPoint)
 
                 // 左边
-                for (index in 0..finalImage.height - 1 - (currentSide shl 1))
-                    finalImage.setRGB(
-                        leftPoint, index + currentSide,
-                        finalImage.getRGB(currentSide, index + currentSide)
-                    )
+                for (index in 0..finalImage.height - 1 - (currentSide shl 1)) finalImage.setRGB(
+                    leftPoint, index + currentSide, finalImage.getRGB(currentSide, index + currentSide)
+                )
                 // 右边
-                for (index in 0..finalImage.height - 1 - (currentSide shl 1))
-                    finalImage.setRGB(
-                        rightPoint, index + currentSide,
-                        finalImage.getRGB(rightSide, index + currentSide)
-                    )
+                for (index in 0..finalImage.height - 1 - (currentSide shl 1)) finalImage.setRGB(
+                    rightPoint, index + currentSide, finalImage.getRGB(rightSide, index + currentSide)
+                )
                 // 顶边
-                for (index in 0..finalImage.width - 1 - (currentSide shl 1))
-                    finalImage.setRGB(
-                        index + currentSide, topPoint,
-                        finalImage.getRGB(index + currentSide, currentSide)
-                    )
+                for (index in 0..finalImage.width - 1 - (currentSide shl 1)) finalImage.setRGB(
+                    index + currentSide, topPoint, finalImage.getRGB(index + currentSide, currentSide)
+                )
                 // 底边
-                for (index in 0..finalImage.width - 1 - (currentSide shl 1))
-                    finalImage.setRGB(
-                        index + currentSide, bottomPoint,
-                        finalImage.getRGB(index + currentSide, bottomSide)
-                    )
+                for (index in 0..finalImage.width - 1 - (currentSide shl 1)) finalImage.setRGB(
+                    index + currentSide, bottomPoint, finalImage.getRGB(index + currentSide, bottomSide)
+                )
             }
 
             return finalImage
         }
     }
+
+    /**
+     * 获取纹理UV坐标
+     *
+     * @param id 图片id
+     * @param uv 数组，长度需为4
+     */
+    fun getUv(id: String, outUv: FloatArray, errorId: String = "error") {
+        var id = id //可能是错误方块id
+        if (outUv.size != 4) throw ArrayException("uv数组大小不为4")
+        val atlas: Atlas =
+            if (getAtlas(id) == null) {
+                id = errorId
+                getAtlas(errorId)!!
+            } else getAtlas(id)!!
+
+        val textureIndex = atlas.nameMap[id]!!
+
+        val index = textureIndex.value
+
+        val column = index % atlas.rowLength
+        val row = index / atlas.rowLength
+
+        val x = (column * atlas.imageSide.value) + extendPixel + (column * (extendPixel shl 1))
+        val y = (row * atlas.imageSide.value) + extendPixel + (row * (extendPixel shl 1))
+
+        val atlasSide = atlas.atlasSide.value.toFloat()
+        val imageSide = atlas.imageSide.value.toFloat()
+
+        outUv[0] = x.toFloat() / atlasSide
+        outUv[1] = y.toFloat() / atlasSide
+        outUv[2] = (x.toFloat() + imageSide) / atlasSide
+        outUv[3] = (y.toFloat() + imageSide) / atlasSide
+    }
+
+    fun getAtlas(id: String): Atlas? = atlas.find { it.nameMap[id] != null }
 
     @JvmInline
     value class Side(val value: Int)

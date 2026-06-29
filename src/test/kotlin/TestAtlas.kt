@@ -12,7 +12,7 @@ import kotlin.test.Test
 class TestAtlas {
     @Test
     fun test01() {
-        val inFile = File("B:\\Java\\Kotlin\\JumpJump\\resource\\tile")
+        val inFile = File("B:\\Java\\Kotlin\\JumpJump\\resource\\block")
         val files: List<File> = inFile.listFiles().toList()
 
         val atlas: TextureAtlas = TextureAtlas.create("test", files)
