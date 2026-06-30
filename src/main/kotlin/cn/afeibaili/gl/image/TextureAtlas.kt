@@ -14,11 +14,14 @@ import kotlin.math.sqrt
 /**
  * # 纹理图集
  *
+ * @param atlas 可能为不同大小的纹理集
+ * @param extendPixel 扩展的像素大小
+ *
  * @author AfeiBaili
  * @version 2026/6/4 20:55
  */
 
-class TextureAtlas(val atlas: List<Atlas>, val extendPixel: Int) {
+class TextureAtlas(val atlas: Map<Index, Atlas>, val extendPixel: Int) {
     companion object {
         private val logger = LoggerFactory.create("TextureAtlas")
 
@@ -50,7 +53,9 @@ class TextureAtlas(val atlas: List<Atlas>, val extendPixel: Int) {
             // 文件图集
             imageFiles.forEach { file ->
                 val name = runCatching {
-                    file.name.split(".").first()
+                    val split: List<String> = file.name.split(".")
+                    if (split.last() != "png") return@forEach
+                    split.first()
                 }.getOrElse {
                     throw ImageException("无法获取文件名字: ${file.canonicalPath}。请用png格式")
                 }
@@ -83,8 +88,8 @@ class TextureAtlas(val atlas: List<Atlas>, val extendPixel: Int) {
             }
 
             //// 转换图集 /////////////////////////////////////
-            val atlases = mutableListOf<Atlas>()
-            atlasMap.forEach { (side, images) ->
+            val atlases = mutableMapOf<Index, Atlas>()
+            atlasMap.toList().forEachIndexed { index, (side, images) ->
                 val ceil = ceil(sqrt(images.size.toDouble())).toInt()
                 val atlasSide: Int = ceil * side.value + ceil * (extendPixel shl 1)
                 val atlasBufferImage = BufferedImage(atlasSide, atlasSide, BufferedImage.TYPE_INT_ARGB)
@@ -101,16 +106,15 @@ class TextureAtlas(val atlas: List<Atlas>, val extendPixel: Int) {
                     nameMap[name] = Index(index)
                 }
                 atlasBufferImage.graphics.dispose()
-                atlases.add(
-                    Atlas(
-                        atlasBufferImage,
-                        nameMap,
-                        Size(images.size),
-                        side,
-                        Side(atlasSide),
-                        Texture(atlasBufferImage),
-                        ceil
-                    )
+                atlases[Index(index)] = Atlas(
+                    Index(index),
+                    atlasBufferImage,
+                    nameMap,
+                    Size(images.size),
+                    side,
+                    Side(atlasSide),
+                    Texture(atlasBufferImage),
+                    ceil
                 )
                 val atlasSize = "${atlasSide}x$atlasSide"
 
@@ -185,7 +189,7 @@ class TextureAtlas(val atlas: List<Atlas>, val extendPixel: Int) {
      * @param id 图片id
      * @param uv 数组，长度需为4
      */
-    fun getUv(id: String, outUv: FloatArray, errorId: String = "error") {
+    fun getUv(id: String, outUv: FloatArray, errorId: String = "error"): Atlas {
         var id = id //可能是错误方块id
         if (outUv.size != 4) throw ArrayException("uv数组大小不为4")
         val atlas: Atlas =
@@ -211,9 +215,10 @@ class TextureAtlas(val atlas: List<Atlas>, val extendPixel: Int) {
         outUv[1] = y.toFloat() / atlasSide
         outUv[2] = (x.toFloat() + imageSide) / atlasSide
         outUv[3] = (y.toFloat() + imageSide) / atlasSide
+        return atlas
     }
 
-    fun getAtlas(id: String): Atlas? = atlas.find { it.nameMap[id] != null }
+    fun getAtlas(id: String): Atlas? = atlas.values.find { it.nameMap[id] != null }
 
     @JvmInline
     value class Side(val value: Int)
@@ -227,6 +232,7 @@ class TextureAtlas(val atlas: List<Atlas>, val extendPixel: Int) {
     value class Index(val value: Int)
 
     class Atlas(
+        val atlasId: Index,
         val image: BufferedImage,
         val nameMap: Map<String, Index>,
         val size: Size,
