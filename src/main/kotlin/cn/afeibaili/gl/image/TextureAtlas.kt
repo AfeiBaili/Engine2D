@@ -57,7 +57,7 @@ class TextureAtlas(val atlas: Map<Index, Atlas>, val extendPixel: Int) {
                     if (split.last() != "png") return@forEach
                     split.first()
                 }.getOrElse {
-                    throw ImageException("无法获取文件名字: ${file.canonicalPath}。请用png格式")
+                    throw ImageException("文件格式解析失败: ${file.canonicalPath}。请检查文件格式")
                 }
                 val readImageBuffer: BufferedImage = runCatching {
                     ImageIO.read(file)
@@ -89,7 +89,7 @@ class TextureAtlas(val atlas: Map<Index, Atlas>, val extendPixel: Int) {
 
             //// 转换图集 /////////////////////////////////////
             val atlases = mutableMapOf<Index, Atlas>()
-            atlasMap.toList().forEachIndexed { index, (side, images) ->
+            atlasMap.toList().forEachIndexed { atlasId, (side, images) ->
                 val ceil = ceil(sqrt(images.size.toDouble())).toInt()
                 val atlasSide: Int = ceil * side.value + ceil * (extendPixel shl 1)
                 val atlasBufferImage = BufferedImage(atlasSide, atlasSide, BufferedImage.TYPE_INT_ARGB)
@@ -106,8 +106,8 @@ class TextureAtlas(val atlas: Map<Index, Atlas>, val extendPixel: Int) {
                     nameMap[name] = Index(index)
                 }
                 atlasBufferImage.graphics.dispose()
-                atlases[Index(index)] = Atlas(
-                    Index(index),
+                atlases[Index(atlasId)] = Atlas(
+                    Index(atlasId),
                     atlasBufferImage,
                     nameMap,
                     Size(images.size),
@@ -198,18 +198,22 @@ class TextureAtlas(val atlas: Map<Index, Atlas>, val extendPixel: Int) {
                 getAtlas(errorId)!!
             } else getAtlas(id)!!
 
-        val textureIndex = atlas.nameMap[id]!!
+        return getUvByAtlas(id, atlas, outUv)
+    }
+
+    fun getUvByAtlas(id: String, atlas: Atlas, outUv: FloatArray): Atlas {
+        val textureIndex = atlas.textureNameMap[id]!!
 
         val index = textureIndex.value
 
         val column = index % atlas.rowLength
         val row = index / atlas.rowLength
 
-        val x = (column * atlas.imageSide.value) + extendPixel + (column * (extendPixel shl 1))
-        val y = (row * atlas.imageSide.value) + extendPixel + (row * (extendPixel shl 1))
+        val x = (column * atlas.textureSide.value) + extendPixel + (column * (extendPixel shl 1))
+        val y = (row * atlas.textureSide.value) + extendPixel + (row * (extendPixel shl 1))
 
         val atlasSide = atlas.atlasSide.value.toFloat()
-        val imageSide = atlas.imageSide.value.toFloat()
+        val imageSide = atlas.textureSide.value.toFloat()
 
         outUv[0] = x.toFloat() / atlasSide
         outUv[1] = y.toFloat() / atlasSide
@@ -218,7 +222,7 @@ class TextureAtlas(val atlas: Map<Index, Atlas>, val extendPixel: Int) {
         return atlas
     }
 
-    fun getAtlas(id: String): Atlas? = atlas.values.find { it.nameMap[id] != null }
+    fun getAtlas(id: String): Atlas? = atlas.values.find { it.textureNameMap[id] != null }
 
     @JvmInline
     value class Side(val value: Int)
@@ -226,19 +230,19 @@ class TextureAtlas(val atlas: Map<Index, Atlas>, val extendPixel: Int) {
     @JvmInline
     value class Size(val value: Int)
 
-    class PreProcessImage(val name: String, var bufferedImage: BufferedImage)
-
     @JvmInline
     value class Index(val value: Int)
 
+    class PreProcessImage(val name: String, var bufferedImage: BufferedImage)
+
     class Atlas(
-        val atlasId: Index,
-        val image: BufferedImage,
-        val nameMap: Map<String, Index>,
-        val size: Size,
-        val imageSide: Side,
-        val atlasSide: Side,
-        val texture: Texture,
-        val rowLength: Int,
+        val atlasId: Index,                     // 图集id
+        val bufferedImage: BufferedImage,       // 图集缓存
+        val textureNameMap: Map<String, Index>, // 纹理名称映射
+        val textureSize: Size,                  // 纹理数量
+        val textureSide: Side,                  // 纹理边长
+        val atlasSide: Side,                    // 图集边长
+        val texture: Texture,                   // 纹理实例
+        val rowLength: Int,                     // 行数量
     )
 }

@@ -20,4 +20,15 @@ class TestAtlas {
         atlas.getUv("dirt", uv)
         println(uv.joinToString("、"))
     }
+
+    @Test
+    fun test02() {
+        val dynamicRegex = ".*_([0-9]+)\\.png".toRegex()
+        val matchStr = "dirt_2212a.png"
+        val matches: Boolean = dynamicRegex.matches(matchStr)
+        if (matches) {
+            println(dynamicRegex.find(matchStr)!!.groups[1]!!.value)
+        }
+        println(matches)
+    }
 }
