@@ -225,7 +225,7 @@ class TextureAtlas(val atlas: Map<Index, Atlas>, val extendPixel: Int) {
     fun getUvs(id: String): List<FloatArray> {
         val atlas: Atlas? = getAtlas(id)
         if (atlas == null)
-            return throw UnknownElementException("未知的id，找不到uv: $id")
+            throw UnknownElementException("未知的id，找不到uv: $id")
         return getUvByAtlas(id, atlas)
     }
 
