@@ -16,9 +16,9 @@ class TestAtlas {
         val files: List<File> = inFile.listFiles().toList()
 
         val atlas: TextureAtlas = TextureAtlas.create("test", files)
-        val uv = FloatArray(4)
-        atlas.getUv("dirt", uv)
-        println(uv.joinToString("、"))
+//        val uv = FloatArray(4)
+//        atlas.getUv("dirt", uv)
+//        println(uv.joinToString("、"))
     }
 
     @Test

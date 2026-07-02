@@ -2,7 +2,12 @@ package cn.afeibaili.gl.image
 
 import cn.afeibaili.gl.exception.ArrayException
 import cn.afeibaili.gl.exception.ImageException
+import cn.afeibaili.gl.image.PreProcessImageInfo.Companion.transform
 import cn.afeibaili.gl.logger.LoggerFactory
+import cn.afeibaili.gl.tool.Index
+import cn.afeibaili.gl.tool.Side
+import cn.afeibaili.gl.tool.Size
+import cn.afeibaili.gl.tool.putElementOrCreateList
 import java.awt.Graphics
 import java.awt.image.BufferedImage
 import java.io.File
@@ -14,8 +19,11 @@ import kotlin.math.sqrt
 /**
  * # 纹理图集
  *
+ * 图集中可能包含动态纹理，动态纹理由 `Atlas` index来管理
+ *
  * @param atlas 可能为不同大小的纹理集
  * @param extendPixel 扩展的像素大小
+ * @see Atlas
  *
  * @author AfeiBaili
  * @version 2026/6/4 20:55
@@ -42,23 +50,19 @@ class TextureAtlas(val atlas: Map<Index, Atlas>, val extendPixel: Int) {
             vararg models: TextureModel,
         ): TextureAtlas {
             //// 根据图片大小区分图集 ///////////////////////////
-            val atlasMap = HashMap<Side, MutableList<PreProcessImage>>()  //根据图片大小分类图片
-
-            fun HashMap<Side, MutableList<PreProcessImage>>.addAndCheck(side: Side, id: String, image: BufferedImage) {
-                val images = this[side]
-                if (images != null) images.add(PreProcessImage(id, image))
-                else this[side] = mutableListOf(PreProcessImage(id, image))
-            }
+            val atlasMap = HashMap<Side, MutableList<PreProcessImageSet>>()  //根据图片大小分类图片
+            val imageMap = HashMap<String, List<PreProcessImageInfo>>() //存放动态或静态图片
 
             // 文件图集
             imageFiles.forEach { file ->
-                val name = runCatching {
+                val (id, index) = runCatching {
                     val split: List<String> = file.name.split(".")
                     if (split.last() != "png") return@forEach
-                    split.first()
-                }.getOrElse {
-                    throw ImageException("文件格式解析失败: ${file.canonicalPath}。请检查文件格式")
+                    getIdAndIndex(split.first())
+                }.getOrElse { exception ->
+                    throw ImageException("图片获取id错误: ${exception.message}")
                 }
+
                 val readImageBuffer: BufferedImage = runCatching {
                     ImageIO.read(file)
                 }.getOrElse { throw ImageException("此文件无法转为图片: ${file.canonicalPath}") }
@@ -67,43 +71,63 @@ class TextureAtlas(val atlas: Map<Index, Atlas>, val extendPixel: Int) {
                 if (width != height) throw ImageException("图片宽高不一致，请用正方形图片")
                 val side = Side(width)
 
-                atlasMap.addAndCheck(side, name, readImageBuffer)
+                imageMap.putElementOrCreateList(id, Triple(index, readImageBuffer, side).transform())
             }
             // 自定义图集
             models.forEach { model ->
-                val id: String = model.id
+                val (id, index) = runCatching {
+                    getIdAndIndex(model.id)
+                }.getOrElse { exception ->
+                    throw ImageException("图片获取id错误: ${exception.message}")
+                }
+
                 val width = model.image.width
                 val height = model.image.height
                 if (width != height) throw ImageException("图片宽高不一致，请用正方形图片")
                 val side = Side(width)
 
-                atlasMap.addAndCheck(side, id, model.image)
+                imageMap.putElementOrCreateList(id, Triple(index, model.image, side).transform())
+            }
+            //// 转换预处理图片，处理静态动态图片 //////////////////
+            imageMap.forEach { (id, list) ->
+                val groupBy = list.groupBy { it.side }
+                if (groupBy.size != 1) throw ImageException("动态纹理请保持比例相同: $id")
+                atlasMap.putElementOrCreateList(
+                    groupBy.keys.toList()[0],
+                    PreProcessImageSet(id, list.sortedBy { it.index.value })
+                )
             }
 
             //// 扩展图片 /////////////////////////////////////
             atlasMap.forEach { (side, images) ->
                 images.forEach { image ->
-                    image.bufferedImage = extendSide(image.bufferedImage, extendPixel)
+                    image.indexImageList.forEach {
+                        it.image = extendSide(it.image, extendPixel)
+                    }
                 }
             }
 
             //// 转换图集 /////////////////////////////////////
             val atlases = mutableMapOf<Index, Atlas>()
             atlasMap.toList().forEachIndexed { atlasId, (side, images) ->
-                val ceil = ceil(sqrt(images.size.toDouble())).toInt()
+                val ceil = ceil(sqrt(images.sumOf { it.indexImageList.size }.toDouble())).toInt()
                 val atlasSide: Int = ceil * side.value + ceil * (extendPixel shl 1)
                 val atlasBufferImage = BufferedImage(atlasSide, atlasSide, BufferedImage.TYPE_INT_ARGB)
-                val nameMap = HashMap<String, Index>()
+                val nameMap = mutableMapOf<String, List<Index>>()
 
                 var currentX: Int
                 var currentY: Int
-                images.forEachIndexed { index, ppi ->
-                    val name = ppi.name
-                    val image = ppi.bufferedImage
-                    currentX = (index % ceil) * (side.value + (extendPixel shl 1))
-                    currentY = (index / ceil) * (side.value + (extendPixel shl 1))
-                    atlasBufferImage.graphics.drawImage(image, currentX, currentY, null)
-                    nameMap[name] = Index(index)
+                var index = 0
+                images.forEach { ppis ->
+                    ppis.indexImageList.forEach { ppii ->
+                        val name = ppis.name
+                        val image = ppii.image
+                        currentX = (index % ceil) * (side.value + (extendPixel shl 1))
+                        currentY = (index / ceil) * (side.value + (extendPixel shl 1))
+                        atlasBufferImage.graphics.drawImage(image, currentX, currentY, null)
+                        nameMap.putElementOrCreateList(name, Index(index))
+                        index++
+                    }
                 }
                 atlasBufferImage.graphics.dispose()
                 atlases[Index(atlasId)] = Atlas(
@@ -124,6 +148,15 @@ class TextureAtlas(val atlas: Map<Index, Atlas>, val extendPixel: Int) {
             }
 
             return TextureAtlas(atlases, extendPixel)
+        }
+
+        internal fun getIdAndIndex(name: String): Pair<String, Index> {
+            val matchRegex = "(.*)_([0-9]+)".toRegex()
+            val bool: Boolean = matchRegex.matches(name)
+            if (!bool) return name to Index(0)
+            val id: String = matchRegex.find(name)!!.groups[1]!!.value
+            val index: Int = matchRegex.find(name)!!.groups[2]!!.value.toInt()
+            return id to Index(index)
         }
 
         fun extendSide(sourceImage: BufferedImage, extendPixel: Int): BufferedImage {
@@ -192,11 +225,10 @@ class TextureAtlas(val atlas: Map<Index, Atlas>, val extendPixel: Int) {
     fun getUv(id: String, outUv: FloatArray, errorId: String = "error"): Atlas {
         var id = id //可能是错误方块id
         if (outUv.size != 4) throw ArrayException("uv数组大小不为4")
-        val atlas: Atlas =
-            if (getAtlas(id) == null) {
-                id = errorId
-                getAtlas(errorId)!!
-            } else getAtlas(id)!!
+        val atlas: Atlas = if (getAtlas(id) == null) {
+            id = errorId
+            getAtlas(errorId)!!
+        } else getAtlas(id)!!
 
         return getUvByAtlas(id, atlas, outUv)
     }
@@ -204,7 +236,9 @@ class TextureAtlas(val atlas: Map<Index, Atlas>, val extendPixel: Int) {
     fun getUvByAtlas(id: String, atlas: Atlas, outUv: FloatArray): Atlas {
         val textureIndex = atlas.textureNameMap[id]!!
 
-        val index = textureIndex.value
+
+        //fixme 修复uv
+        val index = 0
 
         val column = index % atlas.rowLength
         val row = index / atlas.rowLength
@@ -223,26 +257,4 @@ class TextureAtlas(val atlas: Map<Index, Atlas>, val extendPixel: Int) {
     }
 
     fun getAtlas(id: String): Atlas? = atlas.values.find { it.textureNameMap[id] != null }
-
-    @JvmInline
-    value class Side(val value: Int)
-
-    @JvmInline
-    value class Size(val value: Int)
-
-    @JvmInline
-    value class Index(val value: Int)
-
-    class PreProcessImage(val name: String, var bufferedImage: BufferedImage)
-
-    class Atlas(
-        val atlasId: Index,                     // 图集id
-        val bufferedImage: BufferedImage,       // 图集缓存
-        val textureNameMap: Map<String, Index>, // 纹理名称映射
-        val textureSize: Size,                  // 纹理数量
-        val textureSide: Side,                  // 纹理边长
-        val atlasSide: Side,                    // 图集边长
-        val texture: Texture,                   // 纹理实例
-        val rowLength: Int,                     // 行数量
-    )
 }
