@@ -22,7 +22,7 @@ import java.awt.image.BufferedImage
  * @author AfeiBaili
  */
 
-class Atlas(
+data class Atlas(
     val atlasId: Index,                             // 图集id
     val bufferedImage: BufferedImage,               // 图集缓存
     val textureNameMap: Map<String, List<Index>>,   // 纹理名称映射

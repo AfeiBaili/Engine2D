@@ -134,7 +134,7 @@ class TextureAtlas(val atlas: Map<Index, Atlas>, val extendPixel: Int) {
                     Index(atlasId),
                     atlasBufferImage,
                     nameMap,
-                    Size(images.size),
+                    Size(images.sumOf { it.indexImageList.size }),
                     side,
                     Side(atlasSide),
                     Texture(atlasBufferImage),
