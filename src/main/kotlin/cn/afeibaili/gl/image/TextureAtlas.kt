@@ -1,7 +1,7 @@
 package cn.afeibaili.gl.image
 
-import cn.afeibaili.gl.exception.ArrayException
 import cn.afeibaili.gl.exception.ImageException
+import cn.afeibaili.gl.exception.UnknownElementException
 import cn.afeibaili.gl.image.PreProcessImageInfo.Companion.transform
 import cn.afeibaili.gl.logger.LoggerFactory
 import cn.afeibaili.gl.tool.Index
@@ -222,38 +222,33 @@ class TextureAtlas(val atlas: Map<Index, Atlas>, val extendPixel: Int) {
      * @param id 图片id
      * @param uv 数组，长度需为4
      */
-    fun getUv(id: String, outUv: FloatArray, errorId: String = "error"): Atlas {
-        var id = id //可能是错误方块id
-        if (outUv.size != 4) throw ArrayException("uv数组大小不为4")
-        val atlas: Atlas = if (getAtlas(id) == null) {
-            id = errorId
-            getAtlas(errorId)!!
-        } else getAtlas(id)!!
-
-        return getUvByAtlas(id, atlas, outUv)
+    fun getUvs(id: String): List<FloatArray> {
+        val atlas: Atlas? = getAtlas(id)
+        if (atlas == null)
+            return throw UnknownElementException("未知的id，找不到uv: $id")
+        return getUvByAtlas(id, atlas)
     }
 
-    fun getUvByAtlas(id: String, atlas: Atlas, outUv: FloatArray): Atlas {
-        val textureIndex = atlas.textureNameMap[id]!!
+    fun getUvByAtlas(id: String, atlas: Atlas): List<FloatArray> {
+        val textureIndexs = atlas.textureNameMap[id]!!
+        val list: MutableList<FloatArray> = mutableListOf()
 
-
-        //fixme 修复uv
-        val index = 0
-
-        val column = index % atlas.rowLength
-        val row = index / atlas.rowLength
-
-        val x = (column * atlas.textureSide.value) + extendPixel + (column * (extendPixel shl 1))
-        val y = (row * atlas.textureSide.value) + extendPixel + (row * (extendPixel shl 1))
-
-        val atlasSide = atlas.atlasSide.value.toFloat()
-        val imageSide = atlas.textureSide.value.toFloat()
-
-        outUv[0] = x.toFloat() / atlasSide
-        outUv[1] = y.toFloat() / atlasSide
-        outUv[2] = (x.toFloat() + imageSide) / atlasSide
-        outUv[3] = (y.toFloat() + imageSide) / atlasSide
-        return atlas
+        textureIndexs.forEach { it ->
+            val index = it.value
+            val uv = FloatArray(4)
+            val column = index % atlas.rowLength
+            val row = index / atlas.rowLength
+            val x = (column * atlas.textureSide.value) + extendPixel + (column * (extendPixel shl 1))
+            val y = (row * atlas.textureSide.value) + extendPixel + (row * (extendPixel shl 1))
+            val atlasSide = atlas.atlasSide.value.toFloat()
+            val imageSide = atlas.textureSide.value.toFloat()
+            uv[0] = x.toFloat() / atlasSide
+            uv[1] = y.toFloat() / atlasSide
+            uv[2] = (x.toFloat() + imageSide) / atlasSide
+            uv[3] = (y.toFloat() + imageSide) / atlasSide
+            list.add(uv)
+        }
+        return list
     }
 
     fun getAtlas(id: String): Atlas? = atlas.values.find { it.textureNameMap[id] != null }

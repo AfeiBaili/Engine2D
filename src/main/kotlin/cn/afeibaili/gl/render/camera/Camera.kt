@@ -2,7 +2,6 @@ package cn.afeibaili.gl.render.camera
 
 import cn.afeibaili.gl.render.setUniform
 import cn.afeibaili.gl.render.shader.Program
-import org.joml.Math.lerp
 import org.joml.Matrix4f
 
 /**
