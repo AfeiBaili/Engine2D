@@ -15,5 +15,11 @@ class TextureModel(val id: String, val image: BufferedImage) {
         inline fun create(id: String, imageAction: () -> BufferedImage): TextureModel {
             return TextureModel(id, imageAction())
         }
+
+        inline fun createDynamic(id: String, imageAction: () -> List<BufferedImage>): List<TextureModel> {
+            val list = mutableListOf<TextureModel>()
+            imageAction().forEach { list.add(TextureModel(id, it)) }
+            return list
+        }
     }
 }
