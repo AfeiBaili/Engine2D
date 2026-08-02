@@ -1,8 +1,8 @@
 package cn.afeibaili.gl.image
 
-import cn.afeibaili.gl.tool.Index
-import cn.afeibaili.gl.tool.Side
-import cn.afeibaili.gl.tool.Size
+import cn.afeibaili.gl.util.Index
+import cn.afeibaili.gl.util.Side
+import cn.afeibaili.gl.util.Size
 import java.awt.image.BufferedImage
 
 /**

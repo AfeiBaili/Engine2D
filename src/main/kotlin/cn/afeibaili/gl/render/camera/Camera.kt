@@ -11,7 +11,7 @@ import org.joml.Matrix4f
  * @version 2026/6/6 16:59
  */
 
-class Camera(val program: Program, val projectionName: String, val viewName: String) {
+class Camera(val program: Program, val projectionName: String = "projection", val viewName: String = "view") {
     val projection: Matrix4f = Matrix4f().ortho(-5f, 5f, -5f, 5f, -1f, 1f)
     val view = Matrix4f()
 

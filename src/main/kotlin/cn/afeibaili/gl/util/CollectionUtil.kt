@@ -1,4 +1,4 @@
-package cn.afeibaili.gl.tool
+package cn.afeibaili.gl.util
 
 inline fun <reified Key, Value> Map<Key, List<Value>>.putElementOrCreateList(key: Key, value: Value) {
     this as MutableMap<Key, List<Value>>

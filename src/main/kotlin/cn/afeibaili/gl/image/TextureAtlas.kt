@@ -4,10 +4,10 @@ import cn.afeibaili.gl.exception.ImageException
 import cn.afeibaili.gl.exception.UnknownElementException
 import cn.afeibaili.gl.image.PreProcessImageInfo.Companion.transform
 import cn.afeibaili.gl.logger.LoggerFactory
-import cn.afeibaili.gl.tool.Index
-import cn.afeibaili.gl.tool.Side
-import cn.afeibaili.gl.tool.Size
-import cn.afeibaili.gl.tool.putElementOrCreateList
+import cn.afeibaili.gl.util.Index
+import cn.afeibaili.gl.util.Side
+import cn.afeibaili.gl.util.Size
+import cn.afeibaili.gl.util.putElementOrCreateList
 import java.awt.Graphics
 import java.awt.image.BufferedImage
 import java.io.File

@@ -1,4 +1,4 @@
-package cn.afeibaili.gl.tool
+package cn.afeibaili.gl.util
 
 @JvmInline
 value class Side(val value: Int)
