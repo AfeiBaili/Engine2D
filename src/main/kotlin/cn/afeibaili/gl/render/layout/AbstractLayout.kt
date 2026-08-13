@@ -10,9 +10,11 @@ package cn.afeibaili.gl.render.layout
  * @version 2026/8/8 22:07
  */
 
-abstract class AbstractLayout : Layout {
+abstract class AbstractLayout(override val setting: Setting) : Layout {
     override var x: Float = 0f
+        get() = container.x + field
     override var y: Float = 0f
+        get() = container.y + field
     override var offsetX: Float = 0f
     override var offsetY: Float = 0f
     override var width: Float = 0f

@@ -8,7 +8,15 @@ package cn.afeibaili.gl.render.layout
  * @version 2026/8/11 11:51
  */
 
-class ScreenLayout : AbstractLayout() {
+class ScreenLayout(
+    override var width: Float,
+    override var height: Float,
+) : Layout {
+    override val setting: Setting = SettingWeight()
+    override var x: Float = 0f
+    override var y: Float = 0f
+    override var offsetX: Float = 0f
+    override var offsetY: Float = 0f
     override var container: Layout
         get() = this
         set(_) {}

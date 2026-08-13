@@ -9,6 +9,7 @@ package cn.afeibaili.gl.render.layout
  */
 
 interface Layout {
+    val setting: Setting
     var x: Float
     var y: Float
     var offsetX: Float

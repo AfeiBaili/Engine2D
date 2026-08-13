@@ -31,9 +31,9 @@ interface WeightContainer : Containable<WeightLayout> {
  * @version 2026/08/11 14:02
  */
 
-abstract class AbstractWeightContainerLayout : AbstractLayout(), WeightContainer {
-    val containerWidth: Float get() = this.container.width
-    val containerHeight: Float get() = this.container.height
+abstract class AbstractWeightContainerLayout(override val setting: SettingWeight) :
+    AbstractLayout(setting),
+    WeightContainer {
 
     fun size(): Float {
         var size = 0f
@@ -62,15 +62,14 @@ class RowWeight(
     override val setting: SettingWeight = SettingWeight(),
     override var container: Layout,
     val builder: RowWeight.() -> Unit,
-) : AbstractWeightContainerLayout() {
+) : AbstractWeightContainerLayout(setting) {
     override val items: MutableList<WeightLayout> = mutableListOf()
     override fun init() {
         builder.invoke(this)
-        val size = size()
-        val rowHeight: Float = containerHeight / size
+        val rowHeight: Float = container.height / size()
         items.forEach { layout ->
             layout.height = rowHeight * layout.weight
-            layout.weight = container.width
+            layout.width = container.width
         }
     }
 }
@@ -86,29 +85,15 @@ class ColumnWeight(
     override val setting: SettingWeight = SettingWeight(),
     override var container: Layout,
     val builder: ColumnWeight.() -> Unit,
-) : AbstractWeightContainerLayout() {
+) : AbstractWeightContainerLayout(setting) {
     override val items: MutableList<WeightLayout> = mutableListOf()
     override fun init() {
         builder.invoke(this)
-        val size = size()
-        val columnWidth: Float = containerWidth / size
+        val columnWidth: Float = container.width / size()
         items.forEach { layout ->
             layout.width = columnWidth * layout.weight
             layout.height = container.height
         }
 
-    }
-}
-
-/**
- * # 权重设置器
- *
- * @author AfeiBaili
- * @version 2026/08/10 12:53
- */
-
-class SettingWeight : Setting() {
-    fun WeightLayout.setWeight(weight: Float) = apply {
-        this.weight = weight
     }
 }

@@ -7,8 +7,7 @@ package cn.afeibaili.gl.render.layout
  * @author AfeiBaili
  * @version 2026/8/9 16:24
  */
-
-abstract class Setting {
+open class Setting {
     fun Layout.setX(x: Float) = apply {
         this.x = x
     }
@@ -35,5 +34,17 @@ abstract class Setting {
 
     fun Layout.setContainer(container: Layout) = apply {
         this.container = container
+    }
+}
+
+/**
+ * # 权重设置器
+ *
+ * @author AfeiBaili
+ * @version 2026/08/10 12:53
+ */
+class SettingWeight : Setting() {
+    fun WeightLayout.setWeight(weight: Float) = apply {
+        this.weight = weight
     }
 }
