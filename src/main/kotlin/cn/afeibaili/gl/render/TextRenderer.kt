@@ -1,6 +1,5 @@
 package cn.afeibaili.gl.render
 
-import cn.afeibaili.gl.Window
 import cn.afeibaili.gl.font.Character
 import cn.afeibaili.gl.font.Font
 import cn.afeibaili.gl.font.Text
@@ -8,7 +7,6 @@ import cn.afeibaili.gl.font.TextList
 import cn.afeibaili.gl.render.camera.Camera
 import cn.afeibaili.gl.render.shader.Program
 import org.lwjgl.opengl.GL45C.*
-import java.io.Closeable
 import java.nio.ByteBuffer
 
 
@@ -19,19 +17,14 @@ import java.nio.ByteBuffer
  * @version 2026/7/8 18:02
  */
 
-class TextRenderer(val font: Font, val program: Program, val camera: Camera, val window: Window) : Closeable {
+class TextRenderer(val font: Font, override val program: Program, override val camera: Camera) : Renderable {
+    //fixme 请优化为常驻内存
     val textList = TextList()
-    val screenWidth get() = window.width
-    val screenHeight get() = window.height
     val vao = glCreateVertexArrays()
     val vbo = glCreateBuffers()
 
     private var bytePreChar = Float.SIZE_BYTES * 4 * 6
     private var maxCharSize: Long = 255L
-        set(value) {
-            glNamedBufferStorage(vbo, value * bytePreChar, GL_DYNAMIC_STORAGE_BIT or GL_MAP_WRITE_BIT)
-            field = value
-        }
 
     init {
         font.texture.upload()
@@ -50,13 +43,14 @@ class TextRenderer(val font: Font, val program: Program, val camera: Camera, val
     }
 
     fun render() {
+        //todo 如果字符数达到255重新接着渲染
         if (textList.isEmpty()) return
         program.use()
         camera.apply()
         font.texture.bind()
         glBindVertexArray(vao)
-        val db: ByteBuffer = glMapNamedBuffer(vbo, GL_WRITE_ONLY) ?: return
-        db.clear()
+        val bb: ByteBuffer = glMapNamedBuffer(vbo, GL_WRITE_ONLY) ?: return
+        bb.clear()
         var totalVertices = 0
         textList.forEach { text ->
             var currentX: Float = text.x
@@ -74,32 +68,32 @@ class TextRenderer(val font: Font, val program: Program, val camera: Camera, val
                 val v1 = character.uv[3] //下
 
                 //p1
-                db.putFloat(currentX)
+                bb.putFloat(currentX)
                     .putFloat(currentY)
                     .putFloat(u0)
                     .putFloat(v1)
                 //p2
-                db.putFloat(currentX + character.width)
+                bb.putFloat(currentX + character.width)
                     .putFloat(currentY)
                     .putFloat(u1)
                     .putFloat(v1)
                 //p3
-                db.putFloat(currentX)
+                bb.putFloat(currentX)
                     .putFloat(currentY + character.height)
                     .putFloat(u0)
                     .putFloat(v0)
                 //p4
-                db.putFloat(currentX + character.width)
+                bb.putFloat(currentX + character.width)
                     .putFloat(currentY)
                     .putFloat(u1)
                     .putFloat(v1)
                 //p5
-                db.putFloat(currentX + character.width)
+                bb.putFloat(currentX + character.width)
                     .putFloat(currentY + character.height)
                     .putFloat(u1)
                     .putFloat(v0)
                 //p6
-                db.putFloat(currentX)
+                bb.putFloat(currentX)
                     .putFloat(currentY + character.height)
                     .putFloat(u0)
                     .putFloat(v0)

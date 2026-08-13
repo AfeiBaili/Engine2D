@@ -5,7 +5,6 @@ import cn.afeibaili.gl.render.shader.Program
 import org.lwjgl.opengl.GL15C.glDeleteBuffers
 import org.lwjgl.opengl.GL30C.glDeleteVertexArrays
 import org.lwjgl.opengl.GL45C.*
-import java.io.Closeable
 import java.nio.ByteBuffer
 
 
@@ -16,7 +15,7 @@ import java.nio.ByteBuffer
  * @version 2026/6/3 21:47
  */
 
-class GridRenderer(val program: Program, val camera: Camera, blockSize: Int = 1024) : Closeable {
+class GridRenderer(override val program: Program, override val camera: Camera, blockSize: Int = 1024) : Renderable {
     val vao: Int = glCreateVertexArrays()
     val uvSize = 4
     val verticesVbo: Int = glCreateBuffers()

@@ -1,0 +1,39 @@
+package cn.afeibaili.gl.render.layout
+
+
+/**
+ * # 布局属性设置类
+ *
+ * @author AfeiBaili
+ * @version 2026/8/9 16:24
+ */
+
+abstract class Setting {
+    fun Layout.setX(x: Float) = apply {
+        this.x = x
+    }
+
+    fun Layout.setY(y: Float) = apply {
+        this.y = y
+    }
+
+    fun Layout.setWidth(width: Float) = apply {
+        this.width = width
+    }
+
+    fun Layout.setHeight(height: Float) = apply {
+        this.height = height
+    }
+
+    fun Layout.setOffsetX(x: Float) = apply {
+        this.offsetX = x
+    }
+
+    fun Layout.setOffsetY(y: Float) = apply {
+        this.offsetY = y
+    }
+
+    fun Layout.setContainer(container: Layout) = apply {
+        this.container = container
+    }
+}
