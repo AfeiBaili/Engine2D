@@ -11,13 +11,14 @@ package cn.afeibaili.gl.render.layout
 class ScreenLayout(
     override var width: Float,
     override var height: Float,
-) : Layout {
-    override val setting: Setting = SettingWeight()
+) : Layout<UnknownLayout> {
     override var x: Float = 0f
     override var y: Float = 0f
     override var offsetX: Float = 0f
     override var offsetY: Float = 0f
-    override var container: Layout
+    override val items: MutableList<UnknownLayout> = mutableListOf()
+
+    override var container: UnknownLayout
         get() = this
         set(_) {}
 

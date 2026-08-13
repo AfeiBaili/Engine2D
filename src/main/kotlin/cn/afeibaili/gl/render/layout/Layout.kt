@@ -8,13 +8,16 @@ package cn.afeibaili.gl.render.layout
  * @version 2026/8/11 13:51
  */
 
-interface Layout {
-    val setting: Setting
-    var x: Float
-    var y: Float
-    var offsetX: Float
-    var offsetY: Float
-    var width: Float
-    var height: Float
-    var container: Layout
+
+interface Layout<Component : ComponentType> : ComponentType {
+    val items: MutableList<Component>
+
+    fun append(layout: Component): Layout<Component> {
+        items.add(layout)
+        return this
+    }
+
+    operator fun Component.unaryPlus() {
+        append(this)
+    }
 }

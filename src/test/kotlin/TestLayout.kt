@@ -1,6 +1,6 @@
 import cn.afeibaili.gl.render.layout.RowWeight
-import cn.afeibaili.gl.render.layout.SettingWeight
-import cn.afeibaili.gl.render.layout.WeightLayout
+import cn.afeibaili.gl.render.layout.WeightSetting
+import cn.afeibaili.gl.render.layout.weigth.WeightComponent
 import kotlin.test.Test
 
 /**
@@ -13,8 +13,8 @@ import kotlin.test.Test
 class TestLayout {
     @Test
     fun testLayout() {
-        RowWeight(SettingWeight()) {
-            +WeightLayout()
+        RowWeight(WeightSetting()) {
+            +WeightComponent()
         }
     }
 }
