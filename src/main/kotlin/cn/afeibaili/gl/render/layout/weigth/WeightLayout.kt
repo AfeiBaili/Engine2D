@@ -4,12 +4,13 @@ import cn.afeibaili.gl.render.layout.UnknownLayout
 
 class RowWeight(override var container: UnknownLayout) : AbstractWeightLayout() {
     override fun initWeight() {
-        val weightValue = container.height / weightCount
         var currentY = 0f
         for (element in items) {
-            element.height = weightValue * element.weight
-            element.width = container.width
-            element.y = currentY
+            element.set(
+                element.x, currentY,
+                container.width,
+                container.height / weightCount * element.weight
+            )
             currentY += element.height
         }
     }
@@ -17,12 +18,13 @@ class RowWeight(override var container: UnknownLayout) : AbstractWeightLayout() 
 
 class ColumnWeight(override var container: UnknownLayout) : AbstractWeightLayout() {
     override fun initWeight() {
-        val weightValue = container.width / weightCount
         var currentX = 0f
         for (element in items) {
-            element.width = weightValue * element.weight
-            element.height = container.height
-            element.x = currentX
+            element.set(
+                currentX, element.y,
+                container.width / weightCount * element.weight,
+                container.height
+            )
             currentX += element.width
         }
     }

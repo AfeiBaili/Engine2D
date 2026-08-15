@@ -17,6 +17,13 @@ interface Component {
     var height: Float
     var container: UnknownLayout
 
+    fun set(x: Float, y: Float, width: Float, height: Float) {
+        this.x = x
+        this.y = y
+        this.width = width
+        this.height = height
+    }
+
     fun Setting.setWidth(width: Float) = apply {
         this@Component.width = width
     }

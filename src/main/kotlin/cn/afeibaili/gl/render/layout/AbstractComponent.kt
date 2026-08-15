@@ -12,7 +12,7 @@ abstract class AbstractComponent : Component {
     override var x: Float = 0f
         get() = container.x + offsetX + field
     override var y: Float = 0f
-        get() = container.y + +offsetY + field
+        get() = container.y + offsetY + field
 
     override var offsetX: Float = 0f
     override var offsetY: Float = 0f
