@@ -39,7 +39,7 @@ internal class LoggerImpl(override val name: String) : Logger {
     private fun print(level: String, msg: Any, printer: PrintWriter = outPrinter) {
         val log = "[$level] ${getDate(formatter)} $name: $msg"
         loggerScope.launch { printer.println(log) }
-        if (writeFile) loggerScope.launch { filePrinter.println(log) }
+        loggerScope.launch { filePrinter?.println(log) }
     }
 
 
@@ -50,18 +50,25 @@ internal class LoggerImpl(override val name: String) : Logger {
 
         val outPrinter = PrintWriter(System.out, true)
         val errPrinter = PrintWriter(System.err, true)
-        val filePrinter =
-            PrintWriter(FileWriter(File("${System.getProperty("user.dir")}/log/${getDate(fileNameFormatter)}.txt").also {
-                it.parentFile.mkdirs()
-            }), true)
-
+        var filePrinter: PrintWriter? = null
         private fun getDate(formatter: DateTimeFormatter) = LocalDateTime.now().format(formatter)
 
         init {
+            filePrinter = if (writeFile) PrintWriter(
+                FileWriter(
+                    File(
+                        "${System.getProperty("user.dir")}/log/${
+                            getDate(fileNameFormatter)
+                        }.txt"
+                    ).also {
+                        it.parentFile.mkdirs()
+                    }), true
+            ) else null
+
             Runtime.getRuntime().addShutdownHook(Thread {
                 outPrinter.close()
                 errPrinter.close()
-                filePrinter.close()
+                filePrinter?.close()
                 outPrinter.println("logger is closed")
                 loggerScope.cancel()
             })
