@@ -9,11 +9,12 @@ package cn.afeibaili.gl.render.layout
  */
 
 abstract class AbstractComponent : Component {
-    override var x: Float = 0f
-        get() = container.x + offsetX + field
-    override var y: Float = 0f
-        get() = container.y + offsetY + field
-
+    override var relativeX: Float = 0f
+    override var relativeY: Float = 0f
+    override val absoluteY: Float
+        get() = relativeY + offsetY + container.absoluteY
+    override val absoluteX: Float
+        get() = relativeX + offsetX + container.absoluteX
     override var offsetX: Float = 0f
     override var offsetY: Float = 0f
     override var width: Float = 0f

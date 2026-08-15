@@ -7,7 +7,7 @@ class RowWeight(override var container: UnknownLayout) : AbstractWeightLayout() 
         var currentY = 0f
         for (element in items) {
             element.set(
-                element.x, currentY,
+                element.relativeX, currentY,
                 container.width,
                 container.height / weightCount * element.weight
             )
@@ -21,7 +21,7 @@ class ColumnWeight(override var container: UnknownLayout) : AbstractWeightLayout
         var currentX = 0f
         for (element in items) {
             element.set(
-                currentX, element.y,
+                currentX, element.relativeY,
                 container.width / weightCount * element.weight,
                 container.height
             )

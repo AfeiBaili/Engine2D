@@ -12,11 +12,14 @@ class ScreenLayout(
     override var width: Float,
     override var height: Float,
 ) : Layout<UnknownLayout> {
-    override var x: Float = 0f
-    override var y: Float = 0f
+    override var relativeX: Float = 0f
+    override var relativeY: Float = 0f
     override var offsetX: Float = 0f
     override var offsetY: Float = 0f
+    override val absoluteX: Float = 0f
+    override val absoluteY: Float = 0f
     override val items: MutableList<UnknownLayout> = mutableListOf()
+
 
     override var container: UnknownLayout
         get() = this
@@ -25,7 +28,7 @@ class ScreenLayout(
     fun update(width: Float, height: Float, x: Float = 0f, y: Float = 0f) {
         this.width = width
         this.height = height
-        this.x = x
-        this.y = y
+        this.relativeX = x
+        this.relativeY = y
     }
 }

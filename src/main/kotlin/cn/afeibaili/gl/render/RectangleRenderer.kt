@@ -18,6 +18,9 @@ class RectangleRenderer(override val program: Program, override val camera: Came
     val rectangleMaxSize = 100L
     private val rectangleMap = mutableMapOf<String, Rectangle>()
     private val rectangles get() = rectangleMap.values
+    val test by lazy {
+        1
+    }
 
     init {
         glNamedBufferStorage(vbo, rectangleMaxSize * 4 * Float.SIZE_BYTES, GL_DYNAMIC_STORAGE_BIT or GL_MAP_WRITE_BIT)

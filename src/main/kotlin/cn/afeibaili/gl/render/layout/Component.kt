@@ -9,8 +9,10 @@ package cn.afeibaili.gl.render.layout
  */
 
 interface Component {
-    var x: Float
-    var y: Float
+    var relativeX: Float
+    var relativeY: Float
+    val absoluteX: Float
+    val absoluteY: Float
     var offsetX: Float
     var offsetY: Float
     var width: Float
@@ -18,8 +20,8 @@ interface Component {
     var container: UnknownLayout
 
     fun set(x: Float, y: Float, width: Float, height: Float) {
-        this.x = x
-        this.y = y
+        this.relativeX = x
+        this.relativeY = y
         this.width = width
         this.height = height
     }
