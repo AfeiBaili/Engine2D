@@ -17,7 +17,12 @@ interface Component {
     var offsetY: Float
     var width: Float
     var height: Float
-    var container: UnknownLayout
+    var container: Layout
+    var weight: Float
+
+    fun Component.setting(action: Component.(Setting) -> Unit) {
+        action(this, Setting())
+    }
 
     fun set(x: Float, y: Float, width: Float, height: Float) {
         this.relativeX = x
@@ -42,11 +47,11 @@ interface Component {
         this@Component.offsetY = y
     }
 
-    fun Setting.setContainer(container: Layout<*>) = apply {
+    fun Setting.setContainer(container: Layout) = apply {
         this@Component.container = container
     }
 
-    fun Component.setting(action: Component.(Setting) -> Unit) {
-        action(this, Setting())
+    fun Setting.setWeight(weight: Float) = apply {
+        this@Component.weight = weight
     }
 }

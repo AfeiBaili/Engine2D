@@ -1,9 +1,8 @@
 package cn.afeibaili.gl.render.layout.shape
 
 import cn.afeibaili.gl.render.layout.AbstractComponent
-import cn.afeibaili.gl.render.layout.UnknownLayout
+import cn.afeibaili.gl.render.layout.Layout
 import cn.afeibaili.gl.render.layout.weigth.AbstractWeightLayout
-import cn.afeibaili.gl.render.layout.weigth.WeightComponent
 
 
 /**
@@ -13,7 +12,7 @@ import cn.afeibaili.gl.render.layout.weigth.WeightComponent
  * @version 2026/8/13 12:10
  */
 
-class Rectangle(override var container: UnknownLayout) : AbstractComponent(), WeightComponent {
+class Rectangle(override var container: Layout) : AbstractComponent() {
     override var weight: Float = 0f
 }
 

@@ -10,13 +10,11 @@ import cn.afeibaili.gl.render.layout.AbstractLayout
  * @version 2026/8/13 21:20
  */
 
-abstract class AbstractWeightLayout : AbstractLayout<WeightComponent>() {
+abstract class AbstractWeightLayout : AbstractLayout() {
     val weightCount: Float
         get() {
             var value = 0f
             for (element in items) value += element.weight
             return value
         }
-
-    abstract fun initWeight()
 }

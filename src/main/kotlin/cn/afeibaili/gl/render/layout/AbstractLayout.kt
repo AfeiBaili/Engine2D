@@ -10,6 +10,6 @@ package cn.afeibaili.gl.render.layout
  * @version 2026/8/8 22:07
  */
 
-abstract class AbstractLayout<Component : ComponentType>() : AbstractComponent(), Layout<Component> {
+abstract class AbstractLayout() : AbstractComponent(), Layout {
     override val items: MutableList<Component> = mutableListOf()
 }

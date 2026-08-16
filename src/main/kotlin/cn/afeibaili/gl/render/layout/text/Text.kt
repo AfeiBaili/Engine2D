@@ -1,8 +1,7 @@
 package cn.afeibaili.gl.render.layout.text
 
 import cn.afeibaili.gl.render.layout.AbstractComponent
-import cn.afeibaili.gl.render.layout.UnknownLayout
-import cn.afeibaili.gl.render.layout.weigth.WeightComponent
+import cn.afeibaili.gl.render.layout.Layout
 
 /**
  * # 文本布局类
@@ -14,8 +13,8 @@ import cn.afeibaili.gl.render.layout.weigth.WeightComponent
 class Text(
     val key: String,
     var text: String, updater: TextUpdater? = null,
-    override var container: UnknownLayout,
-) : AbstractComponent(), WeightComponent {
+    override var container: Layout,
+) : AbstractComponent() {
     override var weight: Float = 0f
 
     init {

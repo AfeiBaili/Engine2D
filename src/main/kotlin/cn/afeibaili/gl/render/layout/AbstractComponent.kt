@@ -19,4 +19,5 @@ abstract class AbstractComponent : Component {
     override var offsetY: Float = 0f
     override var width: Float = 0f
     override var height: Float = 0f
+    override var weight: Float = 0f
 }

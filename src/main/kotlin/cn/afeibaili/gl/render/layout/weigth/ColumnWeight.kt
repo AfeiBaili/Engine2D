@@ -1,6 +1,6 @@
 package cn.afeibaili.gl.render.layout.weigth
 
-import cn.afeibaili.gl.render.layout.UnknownLayout
+import cn.afeibaili.gl.render.layout.Layout
 
 /**
  * # 权重布局，基于列
@@ -9,8 +9,8 @@ import cn.afeibaili.gl.render.layout.UnknownLayout
  * @version 2026/08/16 03:12
  */
 
-class ColumnWeight(override var container: UnknownLayout) : AbstractWeightLayout() {
-    override fun initWeight() {
+class ColumnWeight(override var container: Layout) : AbstractWeightLayout() {
+    override fun update() {
         var currentX = 0f
         for (element in items) {
             element.set(

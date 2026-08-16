@@ -9,10 +9,10 @@ package cn.afeibaili.gl.render.layout
  */
 
 
-interface Layout<Component : ComponentType> : ComponentType {
+interface Layout : Component {
     val items: MutableList<Component>
 
-    fun append(layout: Component): Layout<Component> {
+    fun append(layout: Component): Layout {
         items.add(layout)
         return this
     }
@@ -20,4 +20,6 @@ interface Layout<Component : ComponentType> : ComponentType {
     operator fun Component.unaryPlus() {
         append(this)
     }
+
+    fun update()
 }
