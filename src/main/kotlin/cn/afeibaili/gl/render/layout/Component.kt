@@ -51,6 +51,11 @@ interface Component {
         this@Component.container = container
     }
 
+    fun Setting.setSize(width: Float, height: Float) = apply {
+        this@Component.width = width
+        this@Component.height = height
+    }
+
     fun Setting.setWeight(weight: Float) = apply {
         this@Component.weight = weight
     }

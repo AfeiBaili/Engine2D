@@ -17,7 +17,5 @@ class Rectangle(override var container: Layout) : AbstractComponent() {
 }
 
 fun AbstractWeightLayout.rectangle(): Rectangle {
-    val rectangle = Rectangle(this)
-    +rectangle
-    return rectangle
+    return Rectangle(this).also { append(it) }
 }
