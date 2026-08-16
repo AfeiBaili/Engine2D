@@ -20,4 +20,8 @@ abstract class AbstractComponent : Component {
     override var width: Float = 0f
     override var height: Float = 0f
     override var weight: Float = 0f
+
+    override fun toString(): String {
+        return "x: $absoluteX, y: $absoluteY, width: $width, height: $height, weight: $weight"
+    }
 }

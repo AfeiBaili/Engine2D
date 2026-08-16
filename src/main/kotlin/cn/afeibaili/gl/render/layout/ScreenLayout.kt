@@ -37,4 +37,9 @@ class ScreenLayout(
         this.relativeY = y
         update()
     }
+
+    fun layout(action: Layout.() -> Unit) = apply {
+        action()
+        update()
+    }
 }

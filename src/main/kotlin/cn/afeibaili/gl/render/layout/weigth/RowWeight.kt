@@ -15,10 +15,11 @@ class RowWeight(override var container: Layout) : AbstractWeightLayout() {
         for (element in items) {
             element.set(
                 element.relativeX, currentY,
-                container.width,
-                container.height / weightCount * element.weight
+                this.width,
+                this.height / weightCount * element.weight
             )
             currentY += element.height
+            if (element is Layout) element.update()
         }
     }
 }

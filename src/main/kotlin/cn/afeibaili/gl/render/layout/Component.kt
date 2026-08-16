@@ -20,7 +20,7 @@ interface Component {
     var container: Layout
     var weight: Float
 
-    fun Component.setting(action: Component.(Setting) -> Unit) {
+    fun Component.setting(action: Component.(Setting) -> Unit) = apply {
         action(this, Setting())
     }
 
@@ -58,5 +58,18 @@ interface Component {
 
     fun Setting.setWeight(weight: Float) = apply {
         this@Component.weight = weight
+    }
+
+    fun Setting.fillMaxSize() = apply {
+        fillMaxHeight()
+        fillMaxWidth()
+    }
+
+    fun Setting.fillMaxHeight() = apply {
+        this@Component.height = container.height
+    }
+
+    fun Setting.fillMaxWidth() = apply {
+        this@Component.width = container.width
     }
 }

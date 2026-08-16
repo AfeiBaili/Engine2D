@@ -7,15 +7,12 @@ fun Layout.rowWeight(action: RowWeight.() -> Unit): Layout {
     +weight
 
     action(weight)
-    weight.update()
     return weight
 }
 
 fun Layout.columnWeight(action: ColumnWeight.() -> Unit): Layout {
     val weight = ColumnWeight(this)
     +weight
-
     action(weight)
-    weight.update()
     return weight
 }

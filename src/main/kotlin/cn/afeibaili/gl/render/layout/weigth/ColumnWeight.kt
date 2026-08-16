@@ -15,10 +15,11 @@ class ColumnWeight(override var container: Layout) : AbstractWeightLayout() {
         for (element in items) {
             element.set(
                 currentX, element.relativeY,
-                container.width / weightCount * element.weight,
-                container.height
+                this.width / weightCount * element.weight,
+                this.height
             )
             currentX += element.width
+            if (element is Layout) element.update()
         }
     }
 }
