@@ -1,5 +1,7 @@
 package cn.afeibaili.gl.render.layout
 
+import cn.afeibaili.gl.render.layout.align.AlignmentType
+
 
 /**
  * # 布局组件
@@ -19,6 +21,7 @@ interface Component {
     var height: Float
     var container: Layout
     var weight: Float
+    var align: AlignmentType
 
     fun set(x: Float, y: Float, width: Float, height: Float) {
         this.relativeX = x

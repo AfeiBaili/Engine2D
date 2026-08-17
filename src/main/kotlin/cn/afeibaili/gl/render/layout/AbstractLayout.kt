@@ -12,4 +12,10 @@ package cn.afeibaili.gl.render.layout
 
 abstract class AbstractLayout() : AbstractComponent(), Layout {
     override val items: MutableList<Component> = mutableListOf()
+
+    override fun update(){
+        for (component in items) {
+            if (component is Layout) component.update()
+        }
+    }
 }

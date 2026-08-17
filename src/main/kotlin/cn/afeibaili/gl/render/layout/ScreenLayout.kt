@@ -1,5 +1,7 @@
 package cn.afeibaili.gl.render.layout
 
+import cn.afeibaili.gl.render.layout.align.AlignmentType
+
 
 /**
  * # 全屏布局，铺满全屏
@@ -19,6 +21,7 @@ class ScreenLayout(
     override val absoluteX: Float = 0f
     override val absoluteY: Float = 0f
     override var weight: Float = 0f
+    override var align: AlignmentType = AlignmentType.CENTER
     override val items: MutableList<Component> = mutableListOf()
 
 
