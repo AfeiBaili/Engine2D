@@ -16,7 +16,6 @@ open class Setting {
     var weight = 1f
     var align: AlignmentType = AlignmentType.CENTER
 
-
     internal open fun apply(component: Component) {
         component.width = width
         component.height = height
@@ -42,11 +41,11 @@ open class Setting {
         this.offsetY = y
     }
 
-    fun align(type: AlignmentType) {
+    fun align(type: AlignmentType) = apply {
         this.align = type
     }
 
-    fun weight(weight: Float) {
+    fun weight(weight: Float) = apply {
         this.weight = weight
     }
 

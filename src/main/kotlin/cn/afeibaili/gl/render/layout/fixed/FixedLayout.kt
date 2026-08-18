@@ -5,9 +5,11 @@ import cn.afeibaili.gl.render.layout.Setting
 
 class FixedLayout(override var container: Layout) : AbstractFixedLayout()
 
-fun Layout.fixed(setting: Setting = Setting(), action: Layout.() -> Unit): Layout {
+fun Layout.fixed(setting: (Setting) -> Unit = {}, action: Layout.() -> Unit): Layout {
     val layout = FixedLayout(this)
-    setting.apply(layout)
+    val set = Setting()
+    setting(set)
+    set.apply(layout)
     +layout
 
     action(layout)

@@ -15,23 +15,25 @@ import cn.afeibaili.gl.render.layout.align.AlignmentType.*
  */
 abstract class AbstractAlignmentLayout : AbstractLayout() {
     private fun top(component: Component) {
-
+        component.relativeY = 0f
     }
 
     private fun bottom(component: Component) {
-
+        component.relativeY = component.container.height - component.height
     }
 
     private fun left(component: Component) {
-
+        component.relativeX = 0f
     }
 
     private fun right(component: Component) {
-
+        component.relativeX = component.container.width - component.width
     }
 
     private fun center(component: Component) {
-
+        val parent: Layout = component.container
+        component.relativeX = parent.width / 2 - component.width / 2
+        component.relativeY = parent.height / 2 - component.height / 2
     }
 
     override fun update() {
@@ -60,23 +62,23 @@ abstract class AbstractAlignmentLayout : AbstractLayout() {
                 }
 
                 LEFT_CENTER -> {
-                    left(component)
                     center(component)
+                    left(component)
                 }
 
                 RIGHT_CENTER -> {
-                    right(component)
                     center(component)
+                    right(component)
                 }
 
                 TOP_CENTER -> {
-                    top(component)
                     center(component)
+                    top(component)
                 }
 
                 BOTTOM_CENTER -> {
-                    bottom(component)
                     center(component)
+                    bottom(component)
                 }
             }
         }
@@ -93,9 +95,12 @@ abstract class AbstractAlignmentLayout : AbstractLayout() {
 
 class AlignmentLayout(override var container: Layout) : AbstractAlignmentLayout()
 
-fun Layout.block(setting: Setting = Setting(), action: Layout.() -> Unit): AlignmentLayout {
+fun Layout.block(setting: (Setting) -> Unit = {}, action: AlignmentLayout.() -> Unit): AlignmentLayout {
     val layout = AlignmentLayout(this)
-    setting.apply(layout)
+    val set = Setting()
+    setting(set)
+    set.apply(layout)
+
     +layout
     action(layout)
     return layout

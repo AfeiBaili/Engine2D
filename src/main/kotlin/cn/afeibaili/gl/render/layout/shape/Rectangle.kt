@@ -16,9 +16,11 @@ class Rectangle(val key: String, override var container: Layout) : AbstractCompo
     override var weight: Float = 0f
 }
 
-fun Layout.rectangle(setting: Setting = Setting(), key: String): Rectangle {
+fun Layout.rectangle(setting: (Setting) -> Unit, key: String): Rectangle {
     return Rectangle(key, this).also {
-        setting.apply(it)
+        val set = Setting()
+        setting(set)
+        set.apply(it)
         append(it)
     }
 }
