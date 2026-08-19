@@ -56,10 +56,10 @@ class RectangleRenderer(override val program: Program, override val camera: Came
                     .putFloat(rectangle.width)
                     .putFloat(rectangle.height)
                 val color: Color = rectangle.color
-                bb.put(color.red.toByte())
-                bb.put(color.green.toByte())
-                bb.put(color.blue.toByte())
-                bb.put(color.alpha.toByte())
+                bb.put(color.getRed())
+                bb.put(color.getGreen())
+                bb.put(color.getBlue())
+                bb.put(color.getAlpha())
             }
 
         }

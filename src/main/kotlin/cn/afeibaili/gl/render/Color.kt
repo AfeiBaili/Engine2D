@@ -7,6 +7,11 @@ package cn.afeibaili.gl.render
  * @version 2026/08/19 18:40
  */
 class Color(val red: UByte, val green: UByte, val blue: UByte, val alpha: UByte) {
+    fun getRed() = red.toByte()
+    fun getGreen() = green.toByte()
+    fun getBlue() = blue.toByte()
+    fun getAlpha() = alpha.toByte()
+
     override fun toString(): String {
         return "r:$red g:$green b:$blue a:$alpha"
     }
