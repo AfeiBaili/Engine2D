@@ -3,7 +3,6 @@ package cn.afeibaili.gl.render
 import cn.afeibaili.gl.logger.LoggerFactory
 import cn.afeibaili.gl.render.layout.Layout
 import java.io.Closeable
-import kotlin.system.exitProcess
 
 
 typealias Rect = cn.afeibaili.gl.render.layout.shape.Rectangle

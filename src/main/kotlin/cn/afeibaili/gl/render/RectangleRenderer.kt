@@ -9,7 +9,7 @@ import java.nio.ByteBuffer
  * # 矩形渲染器
  *
  * @author AfeiBaili
- * @version 2026/8/12 12:11啊
+ * @version 2026/8/12 12:11
  */
 class RectangleRenderer(override val program: Program, override val camera: Camera) : Renderable {
     private val vao = glCreateVertexArrays()
