@@ -1,5 +1,6 @@
 package cn.afeibaili.gl.render.layout
 
+import cn.afeibaili.gl.render.Color
 import cn.afeibaili.gl.render.layout.align.AlignmentType
 
 
@@ -23,6 +24,7 @@ abstract class AbstractComponent : Component {
     override var height: Float = 0f
     override var weight: Float = 1f
     override var align: AlignmentType = AlignmentType.CENTER
+    override var backgroundColor: Color = Color.NONE
 
     override fun toString(): String {
         return "x: $absoluteX, y: $absoluteY, width: $width, height: $height, weight: $weight"

@@ -1,5 +1,6 @@
 package cn.afeibaili.gl.render.layout
 
+import cn.afeibaili.gl.render.Color
 import cn.afeibaili.gl.render.layout.align.AlignmentType
 
 /**
@@ -15,6 +16,7 @@ open class Setting {
     var offsetY = 0f
     var weight = 1f
     var align: AlignmentType = AlignmentType.CENTER
+    var backgroundColor = Color.NONE
 
     internal open fun apply(component: Component) {
         component.width = width
@@ -23,6 +25,7 @@ open class Setting {
         component.offsetY = offsetY
         component.weight = weight
         component.align = align
+        component.backgroundColor = backgroundColor
     }
 
     fun width(width: Float) = apply {
@@ -52,6 +55,10 @@ open class Setting {
     fun size(width: Float, height: Float) = apply {
         this.width = width
         this.height = height
+    }
+
+    fun backgroundColor(color: Color) = apply {
+        this.backgroundColor = color
     }
 
     fun size(parent: Layout) = apply {

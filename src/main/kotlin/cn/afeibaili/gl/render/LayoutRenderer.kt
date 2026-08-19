@@ -3,6 +3,7 @@ package cn.afeibaili.gl.render
 import cn.afeibaili.gl.logger.LoggerFactory
 import cn.afeibaili.gl.render.layout.Layout
 import java.io.Closeable
+import kotlin.system.exitProcess
 
 
 typealias Rect = cn.afeibaili.gl.render.layout.shape.Rectangle
@@ -33,7 +34,7 @@ class LayoutRenderer(val rectRenderer: RectangleRenderer, val rootLayout: Layout
         logger.info("rectangle count is ${rectangles.size}")
         rectangles.forEach { (key, value) ->
             logger.debug("key:${value.key}, x:${value.absoluteX}, y:${value.absoluteY}, width:${value.width}, height:${value.height}")
-            rectRenderer.put(key, value.absoluteX, value.absoluteY, value.width, value.height)
+            rectRenderer.put(key, value.absoluteX, value.absoluteY, value.width, value.height, value.backgroundColor)
         }
     }
 

@@ -9,33 +9,37 @@ import java.nio.ByteBuffer
  * # 矩形渲染器
  *
  * @author AfeiBaili
- * @version 2026/8/12 12:11
+ * @version 2026/8/12 12:11啊
  */
-
 class RectangleRenderer(override val program: Program, override val camera: Camera) : Renderable {
     private val vao = glCreateVertexArrays()
     private val vbo = glCreateBuffers()
     val rectangleMaxSize = 100L
     private val rectangleMap = mutableMapOf<String, Rectangle>()
     private val rectangles get() = rectangleMap.values
-    val test by lazy {
-        1
-    }
 
     init {
-        glNamedBufferStorage(vbo, rectangleMaxSize * 4 * Float.SIZE_BYTES, GL_DYNAMIC_STORAGE_BIT or GL_MAP_WRITE_BIT)
-        glVertexArrayVertexBuffer(vao, 0, vbo, 0, 4 * Float.SIZE_BYTES)
+        // 4 顶点（float） + 4 颜色 （byte）
+        // 4 * 4 + 4 * 1
+        glNamedBufferStorage(
+            vbo, rectangleMaxSize * (4 * Float.SIZE_BYTES + 4), GL_DYNAMIC_STORAGE_BIT or GL_MAP_WRITE_BIT
+        )
+        glVertexArrayVertexBuffer(vao, 0, vbo, 0, 4 * Float.SIZE_BYTES + 4)
         glVertexArrayAttribFormat(vao, 0, 4, GL_FLOAT, false, 0)
         glVertexArrayAttribBinding(vao, 0, 0)
-        glVertexArrayBindingDivisor(vao, 0, 1)
         glEnableVertexArrayAttrib(vao, 0)
+        glVertexArrayAttribFormat(vao, 1, 4, GL_UNSIGNED_BYTE, true, 4 * Float.SIZE_BYTES)
+        glVertexArrayAttribBinding(vao, 1, 0)
+        glEnableVertexArrayAttrib(vao, 1)
+        glVertexArrayBindingDivisor(vao, 0, 1)
     }
 
-    fun put(key: String, x: Float, y: Float, w: Float, h: Float) {
-        rectangleMap[key] = Rectangle(key, x, y, w, h)
+    fun put(key: String, x: Float, y: Float, w: Float, h: Float, color: Color) {
+        rectangleMap[key] = Rectangle(key, x, y, w, h, color)
     }
 
     fun render() {
+        if (rectangles.isEmpty()) return
         program.use()
         camera.apply()
         glBindVertexArray(vao)
@@ -51,6 +55,11 @@ class RectangleRenderer(override val program: Program, override val camera: Came
                     .putFloat(rectangle.y)
                     .putFloat(rectangle.width)
                     .putFloat(rectangle.height)
+                val color: Color = rectangle.color
+                bb.put(color.red.toByte())
+                bb.put(color.green.toByte())
+                bb.put(color.blue.toByte())
+                bb.put(color.alpha.toByte())
             }
 
         }

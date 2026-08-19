@@ -1,5 +1,6 @@
 package cn.afeibaili.gl.render.layout
 
+import cn.afeibaili.gl.render.Color
 import cn.afeibaili.gl.render.layout.align.AlignmentType
 
 
@@ -13,18 +14,9 @@ import cn.afeibaili.gl.render.layout.align.AlignmentType
 class ScreenLayout(
     override var width: Float,
     override var height: Float,
-) : Layout {
-    override var relativeX: Float = 0f
-    override var relativeY: Float = 0f
-    override var offsetX: Float = 0f
-    override var offsetY: Float = 0f
-    override val absoluteX: Float = 0f
+) : AbstractLayout() {
     override val absoluteY: Float = 0f
-    override var weight: Float = 0f
-    override var align: AlignmentType = AlignmentType.CENTER
-    override val items: MutableList<Component> = mutableListOf()
-
-
+    override val absoluteX: Float = 0f
     override var container: Layout
         get() = this
         set(_) {}

@@ -1,5 +1,6 @@
 package cn.afeibaili.gl.render.layout
 
+import cn.afeibaili.gl.render.Color
 import cn.afeibaili.gl.render.layout.align.AlignmentType
 
 
@@ -22,6 +23,7 @@ interface Component {
     var container: Layout
     var weight: Float
     var align: AlignmentType
+    var backgroundColor: Color
 
     fun set(x: Float, y: Float, width: Float, height: Float) {
         this.relativeX = x

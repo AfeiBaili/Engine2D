@@ -6,4 +6,4 @@ package cn.afeibaili.gl.render
  * @author AfeiBaili
  * @version 2026/08/12 12:57
  */
-class Rectangle(val key: String, val x: Float, val y: Float, val width: Float, val height: Float)
+class Rectangle(val key: String, val x: Float, val y: Float, val width: Float, val height: Float, val color: Color)
