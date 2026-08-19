@@ -21,7 +21,7 @@ class Color(val red: UByte, val green: UByte, val blue: UByte, val alpha: UByte)
 
         fun parse(text: String): Color {
             val removePrefix: String = text.removePrefix("#")
-            if (removePrefix.length > 8) throw IllegalArgumentException("无效的颜色序号: 原因长度大于8, 当前长度${removePrefix.length}")
+            if (removePrefix.length !in 6..8) throw IllegalArgumentException("无效的颜色序号: 原因长度大于8, 当前长度${removePrefix.length}")
             val bytes: List<UByte> = runCatching {
                 removePrefix.chunked(2).map { it.toInt(16).toUByte() }
             }.getOrElse {
