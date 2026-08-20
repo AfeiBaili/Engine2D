@@ -1,11 +1,10 @@
 package cn.afeibaili.gl.render.layout.weigth
 
 import cn.afeibaili.gl.render.layout.Layout
-import cn.afeibaili.gl.render.layout.Setting
 
-fun Layout.rowWeight(setting: (Setting) -> Unit = {}, action: RowWeight.() -> Unit): Layout {
+fun Layout.rowWeight(setting: (WeightSetting) -> Unit = {}, action: RowWeight.() -> Unit): Layout {
     val layout = RowWeight(this)
-    val set = Setting()
+    val set = WeightSetting()
     setting(set)
     set.apply(layout)
     +layout
@@ -14,9 +13,9 @@ fun Layout.rowWeight(setting: (Setting) -> Unit = {}, action: RowWeight.() -> Un
     return layout
 }
 
-fun Layout.columnWeight(setting: (Setting) -> Unit = {}, action: ColumnWeight.() -> Unit): Layout {
+fun Layout.columnWeight(setting: (WeightSetting) -> Unit = {}, action: ColumnWeight.() -> Unit): Layout {
     val layout = ColumnWeight(this)
-    val set = Setting()
+    val set = WeightSetting()
     setting(set)
     set.apply(layout)
     +layout

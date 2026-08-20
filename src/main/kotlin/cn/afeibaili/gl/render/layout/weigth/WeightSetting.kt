@@ -1,7 +1,7 @@
 package cn.afeibaili.gl.render.layout.weigth
 
-import cn.afeibaili.gl.render.layout.Component
 import cn.afeibaili.gl.render.layout.AbstractSetting
+import cn.afeibaili.gl.render.layout.Component
 
 
 /**
@@ -16,7 +16,8 @@ class WeightSetting : AbstractSetting<WeightSetting>() {
 
     override fun apply(component: Component) {
         super.apply(component)
-        this.weight = component.weight
+        component.weight = weight
+
     }
 
     fun weight(weight: Float) = apply {
