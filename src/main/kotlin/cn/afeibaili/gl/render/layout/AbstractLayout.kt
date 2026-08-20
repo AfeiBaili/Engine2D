@@ -13,8 +13,11 @@ package cn.afeibaili.gl.render.layout
 abstract class AbstractLayout() : AbstractComponent(), Layout {
     override val items: MutableList<Component> = mutableListOf()
 
-    override fun update(){
+    override fun update() {
         for (component in items) {
+            if (component.isMaxWidth) component.width = this.width
+            if (component.isMaxHeight) component.height = this.height
+
             if (component is Layout) component.update()
         }
     }

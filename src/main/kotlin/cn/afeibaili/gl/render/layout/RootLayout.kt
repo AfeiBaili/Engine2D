@@ -1,8 +1,5 @@
 package cn.afeibaili.gl.render.layout
 
-import cn.afeibaili.gl.render.Color
-import cn.afeibaili.gl.render.layout.align.AlignmentType
-
 
 /**
  * # 全屏布局，铺满全屏
@@ -11,7 +8,7 @@ import cn.afeibaili.gl.render.layout.align.AlignmentType
  * @version 2026/8/11 11:51
  */
 
-class ScreenLayout(
+class RootLayout(
     override var width: Float,
     override var height: Float,
 ) : AbstractLayout() {
@@ -21,15 +18,9 @@ class ScreenLayout(
         get() = this
         set(_) {}
 
-    override fun update() {
-        items.forEach { if (it is Layout) it.update() else return@forEach }
-    }
-
-    fun update(width: Float, height: Float, x: Float = 0f, y: Float = 0f) {
+    fun update(width: Float, height: Float) {
         this.width = width
         this.height = height
-        this.relativeX = x
-        this.relativeY = y
         update()
     }
 

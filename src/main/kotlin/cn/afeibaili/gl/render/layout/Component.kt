@@ -24,6 +24,8 @@ interface Component {
     var weight: Float
     var align: AlignmentType
     var backgroundColor: Color
+    var isMaxWidth: Boolean
+    var isMaxHeight: Boolean
 
     fun set(x: Float, y: Float, width: Float, height: Float) {
         this.relativeX = x

@@ -26,13 +26,17 @@ class LayoutRenderer(val rectRenderer: RectangleRenderer, val rootLayout: Layout
         }
     }
 
+    fun init() {
+        update()
+        logger.debug("rectangles size: ${rectangles.size}")
+        rectangles.forEach { (_, value) -> logger.debug(value) }
+    }
+
     fun update() {
         rectangles.clear()
         match(rootLayout)
 
-        logger.info("rectangle count is ${rectangles.size}")
         rectangles.forEach { (key, value) ->
-            logger.debug("key:${value.key}, x:${value.absoluteX}, y:${value.absoluteY}, width:${value.width}, height:${value.height}")
             rectRenderer.put(key, value.absoluteX, value.absoluteY, value.width, value.height, value.backgroundColor)
         }
     }
