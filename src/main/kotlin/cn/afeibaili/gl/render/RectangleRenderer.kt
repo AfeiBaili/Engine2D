@@ -45,11 +45,13 @@ class RectangleRenderer(override val program: Program, override val camera: Came
         glBindVertexArray(vao)
         val bb: ByteBuffer = glMapNamedBuffer(vbo, GL_WRITE_ONLY) ?: return
         bb.clear()
+        var renderCount = 0
         rectangles.forEachIndexed { index, rectangle ->
             if (index % 100 == 0 && index != 0) {
                 glUnmapNamedBuffer(vbo)
-                glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, rectangles.size)
+                glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, renderCount)
                 bb.clear()
+                renderCount = 0
             } else {
                 bb.putFloat(rectangle.x)
                     .putFloat(rectangle.y)
@@ -60,11 +62,12 @@ class RectangleRenderer(override val program: Program, override val camera: Came
                 bb.put(color.getGreen())
                 bb.put(color.getBlue())
                 bb.put(color.getAlpha())
+                renderCount++
             }
 
         }
         glUnmapNamedBuffer(vbo)
-        glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, rectangles.size)
+        glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, renderCount)
     }
 
     override fun close() {

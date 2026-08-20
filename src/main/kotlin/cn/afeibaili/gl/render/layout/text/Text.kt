@@ -12,6 +12,7 @@ import cn.afeibaili.gl.render.layout.Layout
 
 class Text(
     val key: String,
+    val size: Float,
     var text: String, updater: TextUpdater? = null,
     override var container: Layout,
 ) : AbstractComponent() {

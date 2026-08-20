@@ -8,7 +8,7 @@ package cn.afeibaili.gl.font
  * @version 2026/7/8 18:03
  */
 
-class Font(val asciiAtlas: AsciiAtlas) {
+class Font(val fontName: String, val fontPath: String, val defaultSize: Int, val asciiAtlas: AsciiAtlas) {
     val texture get() = asciiAtlas.texture
 
     /**

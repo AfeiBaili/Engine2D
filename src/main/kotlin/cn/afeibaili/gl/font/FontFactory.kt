@@ -18,7 +18,7 @@ import javax.imageio.ImageIO
  * @version 2026/7/10 20:06
  */
 
-object FontManager {
+object FontFactory {
     private val logger = LoggerFactory.create("FontManager")
 
     val freetypePointer: Long = memoryStack { it ->
@@ -28,7 +28,7 @@ object FontManager {
         pointer.get(0)
     }
 
-    fun create(fontName: String, filepath: String, fontSize: Int): Font {
+    fun create(fontName: String, filepath: String, defaultSize: Int): Font {
         logger.info("create ascii atlas")
         val face: FT_Face = memoryStack { stack ->
             val pointer: PointerBuffer = stack.mallocPointer(1)
@@ -36,11 +36,11 @@ object FontManager {
                 FreeType.FT_New_Face(freetypePointer, filepath, 0, pointer) == 0
             ) { "无法加载[${fontName}]字体: $filepath" }
             val face: FT_Face = FT_Face.create(pointer[0])
-            FreeType.FT_Set_Pixel_Sizes(face, 0, fontSize)
+            FreeType.FT_Set_Pixel_Sizes(face, 0, defaultSize)
             face
         }
 
-        val border: Int = fontSize * 10
+        val border: Int = defaultSize * 10
         val charMap = mutableMapOf<Char, Character>()
         val image = BufferedImage(border, border, BufferedImage.TYPE_INT_ARGB)
         var currentX = 0
@@ -104,6 +104,6 @@ object FontManager {
         }
         ImageIO.write(image, "png", File("${System.getProperty("user.dir")}/temp/${fontName}.png"))
 
-        return Font(AsciiAtlas(charMap, Texture(image)))
+        return Font(fontName, filepath, defaultSize, AsciiAtlas(charMap, Texture(image)))
     }
 }
