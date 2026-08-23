@@ -9,18 +9,30 @@ package cn.afeibaili.gl.render.layout.text
  */
 
 class TextUpdater {
-    val list = mutableMapOf<String, Text>()
+    val map = mutableMapOf<String, Text>()
 
-    fun put(key: String, text: Text) {
-        list.put(key, text)
-    }
-
-    operator fun get(key: String): Text? {
-        return list[key]
+    fun put(text: Text) {
+        map.put(text.key, text)
     }
 
     fun update(key: String, text: String) {
-        val t: Text? = list[key]
-        t?.text = text
+        val textObj: Text = map[key] ?: return
+        textObj.string = text
+        val stringHeight: Float = textObj.font.getStringHeight(text, textObj.scale)
+        val stringWidth: Float = textObj.font.getStringWidth(text, textObj.scale)
+        textObj.width = stringWidth
+        textObj.height = stringHeight
+        textObj.background.apply {
+            width = stringWidth
+            height = stringHeight
+        }
+    }
+
+    operator fun get(key: String): Text? {
+        return map[key]
+    }
+
+    fun forEach(action: (Text) -> Unit) {
+        map.values.forEach { (action(it)) }
     }
 }

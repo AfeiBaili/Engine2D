@@ -39,7 +39,10 @@ object FontFactory {
             FreeType.FT_Set_Pixel_Sizes(face, 0, defaultSize)
             face
         }
-
+        val sizeMetrics: FT_Size_Metrics = face.size()!!.metrics()
+        val ascent = sizeMetrics.ascender() / 64f
+        val descent = sizeMetrics.descender() / 64f
+        val lineHeight = sizeMetrics.height() / 64f
         val border: Int = defaultSize * 10
         val charMap = mutableMapOf<Char, Character>()
         val image = BufferedImage(border, border, BufferedImage.TYPE_INT_ARGB)
@@ -67,13 +70,13 @@ object FontFactory {
             val size = height * pitch
             val buffer: ByteBuffer? = bitmap.buffer(size)
             if (buffer == null) {
-                charMap.put(char, Character(char, FloatArray(4), advance.toFloat() / 2, height.toFloat(), 0f, 0f))
+                charMap.put(
+                    char,
+                    Character(char, FloatArray(4), advance.toFloat() / 2, height.toFloat(), 0f, 0f, 0f)
+                )
                 continue
             }
             val bearingTop: Int = (metrics.vertBearingY() shr 6).toInt()
-
-            val x = currentX
-            val y = currentY
 
             if (currentX + width >= border) {
                 currentX = 0
@@ -100,10 +103,25 @@ object FontFactory {
 
             currentY -= bearingTop
             currentX += width + 2
-            charMap.put(char, Character(char, uv, width.toFloat(), height.toFloat(), x.toFloat(), y.toFloat()))
+
+            val bearingX = metrics.horiBearingX() / 64f
+            val bearingTopHori = metrics.horiBearingY() / 64f
+            val advanceHori = metrics.horiAdvance() / 64f
+            charMap.put(
+                char,
+                Character(
+                    char,
+                    uv,
+                    width.toFloat(),
+                    height.toFloat(),
+                    bearingX,
+                    bearingTopHori,
+                    advanceHori
+                )
+            )
         }
         ImageIO.write(image, "png", File("${System.getProperty("user.dir")}/temp/${fontName}.png"))
 
-        return Font(fontName, filepath, defaultSize, AsciiAtlas(charMap, Texture(image)))
+        return Font(fontName, filepath, defaultSize, ascent, descent, lineHeight, AsciiAtlas(charMap, Texture(image)))
     }
 }

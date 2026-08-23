@@ -8,21 +8,36 @@ package cn.afeibaili.gl.font
  * @version 2026/7/8 18:03
  */
 
-class Font(val fontName: String, val fontPath: String, val defaultSize: Int, val asciiAtlas: AsciiAtlas) {
+class Font(
+    val fontName: String,
+    val fontPath: String,
+    val defaultSize: Int,
+    val ascent: Float,
+    val descent: Float,
+    val lineHeight: Float,
+    val asciiAtlas: AsciiAtlas,
+) {
     val texture get() = asciiAtlas.texture
 
-    /**
-     * uv结构
-     *
-     *  索引0为起始x点
-     *
-     *  索引1为起始y点
-     *
-     *  索引2为终止x点
-     *
-     *  索引3为终止y点
-     */
     fun getChar(char: Char): Character? {
         return asciiAtlas.asciiMap[char]
+    }
+
+    fun getStringWidth(string: String, scale: Float): Float {
+        var width = 0f
+        string.forEach { char ->
+            val character: Character = getChar(char) ?: return@forEach
+            width += character.width * scale
+        }
+        return width
+    }
+
+    fun getStringHeight(string: String, scale: Float): Float {
+        var maxHeight = 0f
+        string.forEach { char ->
+            val character: Character = getChar(char) ?: return@forEach
+            if (maxHeight < character.height * scale) maxHeight = character.height
+        }
+        return maxHeight
     }
 }

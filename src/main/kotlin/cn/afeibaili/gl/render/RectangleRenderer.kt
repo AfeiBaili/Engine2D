@@ -1,6 +1,7 @@
 package cn.afeibaili.gl.render
 
 import cn.afeibaili.gl.render.camera.Camera
+import cn.afeibaili.gl.render.layout.shape.Rectangle
 import cn.afeibaili.gl.render.shader.Program
 import org.lwjgl.opengl.GL45C.*
 import java.nio.ByteBuffer
@@ -34,8 +35,8 @@ class RectangleRenderer(override val program: Program, override val camera: Came
         glVertexArrayBindingDivisor(vao, 0, 1)
     }
 
-    fun put(key: String, x: Float, y: Float, w: Float, h: Float, color: Color) {
-        rectangleMap[key] = Rectangle(key, x, y, w, h, color)
+    fun put(rectangle: Rectangle) {
+        rectangleMap[rectangle.key] = rectangle
     }
 
     fun render() {
@@ -53,11 +54,11 @@ class RectangleRenderer(override val program: Program, override val camera: Came
                 bb.clear()
                 renderCount = 0
             } else {
-                bb.putFloat(rectangle.x)
-                    .putFloat(rectangle.y)
+                bb.putFloat(rectangle.absoluteX)
+                    .putFloat(rectangle.absoluteY)
                     .putFloat(rectangle.width)
                     .putFloat(rectangle.height)
-                val color: Color = rectangle.color
+                val color: Color = rectangle.backgroundColor
                 bb.put(color.getRed())
                 bb.put(color.getGreen())
                 bb.put(color.getBlue())

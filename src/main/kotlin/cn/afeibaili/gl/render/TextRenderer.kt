@@ -9,7 +9,6 @@ import cn.afeibaili.gl.render.shader.Program
 import org.lwjgl.opengl.GL45C.*
 import java.nio.ByteBuffer
 
-
 /**
  * # 文本渲染器
  *
@@ -50,22 +49,25 @@ class TextRenderer(val font: Font, override val program: Program, override val c
         val bb: ByteBuffer = glMapNamedBuffer(vbo, GL_WRITE_ONLY) ?: return
         bb.clear()
         var totalVertices = 0
+        var charIndex = 0
         textMap.forEach { text ->
             var currentX: Float = text.x
             val currentY: Float = text.y
             val textScale = text.scale
-            text.string.forEachIndexed { index, char ->
-                if (index % maxCharSize == 0 && index != 0) {
+            text.string.forEach { char ->
+                if (charIndex % maxCharSize == 0 && charIndex != 0) {
                     glUnmapNamedBuffer(vbo)
                     glDrawArrays(GL_TRIANGLES, 0, totalVertices)
                     bb.clear()
                     totalVertices = 0
+                    charIndex = 0
                 }
 
                 val character: Character? = font.getChar(char)
                 if (character == null) return@forEach
                 if (character.height == 0f) {
                     currentX += character.width * textScale
+                    return@forEach
                 }
 
                 val x0 = currentX
@@ -86,6 +88,7 @@ class TextRenderer(val font: Font, override val program: Program, override val c
                 bb.putFloat(x0).putFloat(y1).putFloat(u0).putFloat(v0)
                 currentX += character.width * textScale
                 totalVertices += 6
+                charIndex++
             }
         }
         glUnmapNamedBuffer(vbo)
