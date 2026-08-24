@@ -31,4 +31,6 @@ abstract class AbstractComponent : Component {
     override fun toString(): String {
         return "${this::class.simpleName}(rx:$relativeX, ry:$relativeY, ax:$absoluteX, ay:$absoluteY, ox:$offsetX, oy:$offsetY, w:$width, h:$height, we:$weight, a:$align, bc:$backgroundColor, mw:$isMaxWidth, mh:$isMaxHeight)"
     }
+
+    fun toPointerString() = super.toString()
 }

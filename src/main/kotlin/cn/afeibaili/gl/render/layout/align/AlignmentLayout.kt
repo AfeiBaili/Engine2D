@@ -38,6 +38,7 @@ abstract class AbstractAlignmentLayout : AbstractLayout() {
 
     override fun update() {
         for (component in items) {
+            if (component is Layout) component.update()
             when (component.align) {
                 CENTER -> center(component)
 
@@ -82,7 +83,6 @@ abstract class AbstractAlignmentLayout : AbstractLayout() {
                 }
             }
         }
-        super.update()
     }
 }
 

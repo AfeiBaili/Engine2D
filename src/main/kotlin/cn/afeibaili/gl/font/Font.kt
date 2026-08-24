@@ -36,7 +36,7 @@ class Font(
         var maxHeight = 0f
         string.forEach { char ->
             val character: Character = getChar(char) ?: return@forEach
-            if (maxHeight < character.height * scale) maxHeight = character.height
+            if (maxHeight < character.height * scale) maxHeight = character.height * scale
         }
         return maxHeight
     }

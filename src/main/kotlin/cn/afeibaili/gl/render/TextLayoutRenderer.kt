@@ -23,6 +23,7 @@ class TextLayoutRenderer(
     private val textSet = mutableSetOf<TextUpdater>()
     val vao = glCreateVertexArrays()
     val vbo = glCreateBuffers()
+    var showableBackground = false
 
     // 一个字符 = 四个Float字节 + 四个背景色字节 + 四个颜色字节 * 六个顶点
     private val bytePreChar = ((Float.SIZE_BYTES * 4) + 4 + 4) * 6
@@ -86,10 +87,10 @@ class TextLayoutRenderer(
                         return@forEach
                     }
                     val color = text.color
-                    val backgroundColor = text.backgroundColor
-                    val baseline = currentY + text.font.ascent * textScale
+                    val backgroundColor = if (showableBackground) text.backgroundColor else Color.NONE
+                    val baseline = currentY + text.font.ascent
 
-                    val x0 = currentX * textScale
+                    val x0 = currentX
                     val y0 = baseline - character.bearingTop * textScale
                     val x1 = x0 + character.width * textScale
                     val y1 = y0 + character.height * textScale

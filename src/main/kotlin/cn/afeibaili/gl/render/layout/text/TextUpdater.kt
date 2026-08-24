@@ -8,7 +8,7 @@ package cn.afeibaili.gl.render.layout.text
  * @version 2026/8/11 13:18
  */
 
-class TextUpdater {
+class TextUpdater() {
     val map = mutableMapOf<String, Text>()
 
     fun put(text: Text) {
@@ -22,10 +22,6 @@ class TextUpdater {
         val stringWidth: Float = textObj.font.getStringWidth(text, textObj.scale)
         textObj.width = stringWidth
         textObj.height = stringHeight
-        textObj.background.apply {
-            width = stringWidth
-            height = stringHeight
-        }
     }
 
     operator fun get(key: String): Text? {

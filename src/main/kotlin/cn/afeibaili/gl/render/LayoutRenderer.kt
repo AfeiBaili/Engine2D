@@ -51,7 +51,9 @@ class LayoutRenderer(
 
     fun update() {
         updaters.forEach { textRenderer.upload(it) }
+        layouts.forEach { rectRenderer.put(it.backgroundRect) }
         rectangles.forEach { (_, value) -> rectRenderer.put(value) }
+        updaters.forEach { it.forEach { it -> rectRenderer.put(it.backgroundRect) } }
     }
 
     fun render() {

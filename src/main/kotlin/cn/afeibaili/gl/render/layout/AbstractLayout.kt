@@ -1,5 +1,7 @@
 package cn.afeibaili.gl.render.layout
 
+import cn.afeibaili.gl.render.layout.shape.BackgroundRectangle
+
 
 /**
  * # 布局抽象基类
@@ -12,6 +14,8 @@ package cn.afeibaili.gl.render.layout
 
 abstract class AbstractLayout() : AbstractComponent(), Layout {
     override val items: MutableList<Component> = mutableListOf()
+    override val backgroundRect: BackgroundRectangle =
+        BackgroundRectangle(this::class.simpleName + this.toPointerString(), this, this)
 
     override fun update() {
         for (component in items) {
