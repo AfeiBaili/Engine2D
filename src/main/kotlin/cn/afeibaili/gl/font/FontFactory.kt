@@ -18,7 +18,7 @@ import javax.imageio.ImageIO
  * @version 2026/7/10 20:06
  */
 
-object FontManager {
+object FontFactory {
     private val logger = LoggerFactory.create("FontManager")
 
     val freetypePointer: Long = memoryStack { it ->
@@ -28,7 +28,7 @@ object FontManager {
         pointer.get(0)
     }
 
-    fun create(fontName: String, filepath: String, fontSize: Int): Font {
+    fun create(fontName: String, filepath: String, defaultSize: Int): Font {
         logger.info("create ascii atlas")
         val face: FT_Face = memoryStack { stack ->
             val pointer: PointerBuffer = stack.mallocPointer(1)
@@ -36,11 +36,14 @@ object FontManager {
                 FreeType.FT_New_Face(freetypePointer, filepath, 0, pointer) == 0
             ) { "无法加载[${fontName}]字体: $filepath" }
             val face: FT_Face = FT_Face.create(pointer[0])
-            FreeType.FT_Set_Pixel_Sizes(face, 0, fontSize)
+            FreeType.FT_Set_Pixel_Sizes(face, 0, defaultSize)
             face
         }
-
-        val border: Int = fontSize * 10
+        val sizeMetrics: FT_Size_Metrics = face.size()!!.metrics()
+        val ascent = sizeMetrics.ascender() / 64f
+        val descent = sizeMetrics.descender() / 64f
+        val lineHeight = sizeMetrics.height() / 64f
+        val border: Int = defaultSize * 10
         val charMap = mutableMapOf<Char, Character>()
         val image = BufferedImage(border, border, BufferedImage.TYPE_INT_ARGB)
         var currentX = 0
@@ -67,13 +70,13 @@ object FontManager {
             val size = height * pitch
             val buffer: ByteBuffer? = bitmap.buffer(size)
             if (buffer == null) {
-                charMap.put(char, Character(char, FloatArray(4), advance.toFloat() / 2, height.toFloat(), 0f, 0f))
+                charMap.put(
+                    char,
+                    Character(char, FloatArray(4), advance.toFloat() / 2, height.toFloat(), 0f, 0f, 0f)
+                )
                 continue
             }
             val bearingTop: Int = (metrics.vertBearingY() shr 6).toInt()
-
-            val x = currentX
-            val y = currentY
 
             if (currentX + width >= border) {
                 currentX = 0
@@ -100,10 +103,25 @@ object FontManager {
 
             currentY -= bearingTop
             currentX += width + 2
-            charMap.put(char, Character(char, uv, width.toFloat(), height.toFloat(), x.toFloat(), y.toFloat()))
+
+            val bearingX = metrics.horiBearingX() / 64f
+            val bearingTopHori = metrics.horiBearingY() / 64f
+            val advanceHori = metrics.horiAdvance() / 64f
+            charMap.put(
+                char,
+                Character(
+                    char,
+                    uv,
+                    width.toFloat(),
+                    height.toFloat(),
+                    bearingX,
+                    bearingTopHori,
+                    advanceHori
+                )
+            )
         }
         ImageIO.write(image, "png", File("${System.getProperty("user.dir")}/temp/${fontName}.png"))
 
-        return Font(AsciiAtlas(charMap, Texture(image)))
+        return Font(fontName, filepath, defaultSize, ascent, descent, lineHeight, AsciiAtlas(charMap, Texture(image)))
     }
 }

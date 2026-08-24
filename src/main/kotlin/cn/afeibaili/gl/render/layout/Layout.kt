@@ -1,5 +1,7 @@
 package cn.afeibaili.gl.render.layout
 
+import cn.afeibaili.gl.render.layout.shape.BackgroundRectangle
+
 
 /**
  * #  布局接口
@@ -11,6 +13,7 @@ package cn.afeibaili.gl.render.layout
 
 interface Layout : Component {
     val items: MutableList<Component>
+    val backgroundRect: BackgroundRectangle
 
     fun append(layout: Component): Layout {
         items.add(layout)

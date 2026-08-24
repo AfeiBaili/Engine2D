@@ -1,5 +1,7 @@
 package cn.afeibaili.gl.render
 
+import java.nio.ByteBuffer
+
 /**
  * # 颜色
  *
@@ -14,6 +16,10 @@ class Color(val red: UByte, val green: UByte, val blue: UByte, val alpha: UByte)
 
     override fun toString(): String {
         return "r:$red g:$green b:$blue a:$alpha"
+    }
+
+    fun get(buffer: ByteBuffer) {
+        buffer.put(getRed()).put(getGreen()).put(getBlue()).put(getAlpha())
     }
 
     companion object {

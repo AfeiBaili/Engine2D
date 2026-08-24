@@ -9,7 +9,6 @@ import cn.afeibaili.gl.render.layout.align.AlignmentSetting
 import cn.afeibaili.gl.render.layout.weigth.AbstractWeightLayout
 import cn.afeibaili.gl.render.layout.weigth.WeightSetting
 
-
 /**
  * # 矩形
  *
@@ -17,7 +16,7 @@ import cn.afeibaili.gl.render.layout.weigth.WeightSetting
  * @version 2026/8/13 12:10
  */
 
-class Rectangle(val key: String, override var container: Layout) : AbstractComponent() {
+open class Rectangle(val key: String, override var container: Layout) : AbstractComponent() {
     override var weight: Float = 0f
 }
 

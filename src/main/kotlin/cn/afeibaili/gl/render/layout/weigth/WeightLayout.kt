@@ -30,14 +30,14 @@ fun Layout.columnWeight(setting: (Setting) -> Unit, action: ColumnWeight.() -> U
     return buildLayoutColumnWeight(this, Setting().also { setting(it) }).also { action(it) }
 }
 
-fun buildLayoutRowWeight(parent: Layout, setting: AbstractSetting<*>): RowWeight {
+private fun buildLayoutRowWeight(parent: Layout, setting: AbstractSetting<*>): RowWeight {
     val layout = RowWeight(parent)
     setting.apply(layout)
     parent.append(layout)
     return layout
 }
 
-fun buildLayoutColumnWeight(parent: Layout, setting: AbstractSetting<*>): ColumnWeight {
+private fun buildLayoutColumnWeight(parent: Layout, setting: AbstractSetting<*>): ColumnWeight {
     val layout = ColumnWeight(parent)
     setting.apply(layout)
     parent.append(layout)
