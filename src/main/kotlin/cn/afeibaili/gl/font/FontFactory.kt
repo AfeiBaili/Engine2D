@@ -9,6 +9,8 @@ import java.awt.image.BufferedImage
 import java.io.File
 import java.nio.ByteBuffer
 import javax.imageio.ImageIO
+import kotlin.math.ceil
+import kotlin.math.sqrt
 
 
 /**
@@ -28,8 +30,7 @@ object FontFactory {
         pointer.get(0)
     }
 
-    fun create(fontName: String, filepath: String, defaultSize: Int): Font {
-        logger.info("create ascii atlas")
+    fun getFace(fontName: String, filepath: String, defaultSize: Int): FT_Face {
         val face: FT_Face = memoryStack { stack ->
             val pointer: PointerBuffer = stack.mallocPointer(1)
             check(
@@ -39,89 +40,114 @@ object FontFactory {
             FreeType.FT_Set_Pixel_Sizes(face, 0, defaultSize)
             face
         }
+
+        return face
+    }
+
+    fun create(fontName: String, filepath: String, defaultSize: Int): Font {
+        logger.info("create ascii atlas")
+        val face: FT_Face = getFace(fontName, filepath, defaultSize)
         val sizeMetrics: FT_Size_Metrics = face.size()!!.metrics()
         val ascent = sizeMetrics.ascender() / 64f
         val descent = sizeMetrics.descender() / 64f
         val lineHeight = sizeMetrics.height() / 64f
-        val border: Int = defaultSize * 10
+
+        val cellWidth = lineHeight.toInt()
+        val charSize: Int = 127 - 32
+        val ceil = ceil(sqrt(charSize.toDouble())).toInt()
+        val imageSize = cellWidth * ceil
         val charMap = mutableMapOf<Char, Character>()
-        val image = BufferedImage(border, border, BufferedImage.TYPE_INT_ARGB)
-        var currentX = 0
-        var currentY = 0
-        var maxAdvance = 0
-        var maxHeight = 0
+        val image = BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_ARGB)
 
+        var currentCellIndexX = 0
+        var currentCellIndexY = 0
         for (charCode in 32..126) {
-            val char: Char = charCode.toChar()
-            check(
-                FreeType.FT_Load_Char(face, charCode.toLong(), FreeType.FT_LOAD_RENDER) == 0
-            ) { "找不到字符: $charCode" }
-            val glyph: FT_GlyphSlot? = face.glyph()
-            glyph ?: error("字形为空，无法获取字形: $charCode")
-            val metrics: FT_Glyph_Metrics = glyph.metrics()
-            val advance = metrics.horiAdvance().toInt() shr 6
-            if (maxAdvance < advance) maxAdvance = advance
-            val bitmap: FT_Bitmap = glyph.bitmap()
-            val width = bitmap.width()
-            val height = bitmap.rows()
-            if (maxHeight < height) maxHeight = height
-
-            val pitch: Int = bitmap.pitch()
-            val size = height * pitch
-            val buffer: ByteBuffer? = bitmap.buffer(size)
-            if (buffer == null) {
+            val char = charCode.toChar()
+            val charDate = loadChar(char, face)
+            if (charDate.buffer == null) {
                 charMap.put(
-                    char,
-                    Character(char, FloatArray(4), advance.toFloat() / 2, height.toFloat(), 0f, 0f, 0f)
+                    char, Character(
+                        char,
+                        FloatArray(4),
+                        0f,
+                        0f,
+                        0f,
+                        0f,
+                        charDate.advanceX
+                    )
                 )
+                currentCellIndexX++
                 continue
             }
-            val bearingTop: Int = (metrics.vertBearingY() shr 6).toInt()
 
-            if (currentX + width >= border) {
-                currentX = 0
-                currentY += maxAdvance + maxHeight + 2
-            } else {
-                currentY += bearingTop
+            if ((charCode - 32) % ceil == 0 && (charCode - 32) != 0) {
+                currentCellIndexY++
+                currentCellIndexX = 0
             }
-            loop@ for (y in 0 until height) {
-                for (x in 0 until width) {
-                    val index = (y * pitch + x)
-                    val gray = buffer.get(index).toInt() and 0xFF
+
+            val drawCurrentCellX = (currentCellIndexX * cellWidth) + cellWidth / 2 - charDate.advanceX.toInt() / 2
+            val drawCurrentCellY = (currentCellIndexY * cellWidth) + ascent.toInt() - charDate.bearingY
+
+            draw@ for (y in 0 until charDate.height) {
+                for (x in 0 until charDate.pitch) {
+                    val index = (y * charDate.pitch + x)
+                    val gray = charDate.buffer.get(index).toInt() and 0xFF
                     val argb = (gray shl 24) or 0x00FFFFFF
                     runCatching {
-                        image.setRGB(currentX + x, currentY + y, argb)
-                    }.onFailure { continue@loop }
+                        image.setRGB(drawCurrentCellX + x, drawCurrentCellY + y, argb)
+                    }.onFailure { continue@draw }
                 }
             }
 
             val uv = FloatArray(4)
-            uv[0] = currentX.toFloat() / border
-            uv[1] = currentY.toFloat() / border
-            uv[2] = (currentX + width).toFloat() / border
-            uv[3] = (currentY + height).toFloat() / border
+            uv[0] = drawCurrentCellX.toFloat() / imageSize
+            uv[1] = drawCurrentCellY.toFloat() / imageSize
+            uv[2] = (drawCurrentCellX + charDate.width).toFloat() / imageSize
+            uv[3] = (drawCurrentCellY + charDate.height).toFloat() / imageSize
 
-            currentY -= bearingTop
-            currentX += width + 2
-
-            val bearingX = metrics.horiBearingX() / 64f
-            val bearingTopHori = metrics.horiBearingY() / 64f
-            val advanceHori = metrics.horiAdvance() / 64f
             charMap.put(
                 char,
                 Character(
                     char,
                     uv,
-                    width.toFloat(),
-                    height.toFloat(),
-                    bearingX,
-                    bearingTopHori,
-                    advanceHori
+                    charDate.width.toFloat(),
+                    charDate.height.toFloat(),
+                    charDate.bearingX.toFloat(),
+                    charDate.bearingY.toFloat(),
+                    charDate.advanceX
                 )
             )
+            currentCellIndexX++
         }
         ImageIO.write(image, "png", File("${System.getProperty("user.dir")}/temp/${fontName}.png"))
 
         return Font(fontName, filepath, defaultSize, ascent, descent, lineHeight, AsciiAtlas(charMap, Texture(image)))
     }
+
+    fun loadChar(char: Char, face: FT_Face): CharData {
+        val loadedChar: Int = FreeType.FT_Load_Char(face, char.code.toLong(), FreeType.FT_LOAD_RENDER)
+        check(loadedChar == 0) { "找不到字符" }
+        val glyphSlot: FT_GlyphSlot? = face.glyph()
+        glyphSlot ?: error("无法加载字形: $char")
+        val bitmap: FT_Bitmap = glyphSlot.bitmap()
+        val width: Int = bitmap.width()
+        val pitch: Int = bitmap.pitch()
+        val height: Int = bitmap.rows()
+        val advanceX: Float = glyphSlot.advance().x() / 64f
+        val bearingY: Int = glyphSlot.bitmap_top()
+        val bearingX: Int = glyphSlot.bitmap_left()
+        val buffer: ByteBuffer? = bitmap.buffer(pitch * height)
+        return CharData(char, width, height, pitch, bearingX, bearingY, advanceX, buffer)
+    }
+
+    class CharData(
+        val char: Char,
+        val width: Int,
+        val height: Int,
+        val pitch: Int,
+        val bearingX: Int,
+        val bearingY: Int,
+        val advanceX: Float,
+        val buffer: ByteBuffer?,
+    )
 }

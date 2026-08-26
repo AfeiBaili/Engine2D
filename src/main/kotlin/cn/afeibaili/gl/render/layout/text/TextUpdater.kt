@@ -18,7 +18,7 @@ class TextUpdater() {
     fun update(key: String, text: String) {
         val textObj: Text = map[key] ?: return
         textObj.string = text
-        val stringHeight: Float = textObj.font.getStringHeight(text, textObj.scale)
+        val stringHeight: Float = textObj.font.getStringHeight(textObj.scale)
         val stringWidth: Float = textObj.font.getStringWidth(text, textObj.scale)
         textObj.width = stringWidth
         textObj.height = stringHeight

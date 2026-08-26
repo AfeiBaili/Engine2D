@@ -83,15 +83,15 @@ class TextLayoutRenderer(
                     }
                     val character: Character = text.font.getChar(char) ?: return@forEach
                     if (character.height == 0f) {
-                        currentX += character.width * textScale
+                        currentX += character.advanceX * textScale
                         return@forEach
                     }
                     val color = text.color
                     val backgroundColor = if (showableBackground) text.backgroundColor else Color.NONE
-                    val baseline = currentY + text.font.ascent
+                    val baseline = currentY + text.font.ascent * textScale
 
-                    val x0 = currentX
-                    val y0 = baseline - character.bearingTop * textScale
+                    val x0 = currentX + character.bearingX * textScale
+                    val y0 = baseline - character.bearingY * textScale
                     val x1 = x0 + character.width * textScale
                     val y1 = y0 + character.height * textScale
                     val u0 = character.uv[0]
@@ -117,7 +117,7 @@ class TextLayoutRenderer(
                     bb.putFloat(x0).putFloat(y1).putFloat(u0).putFloat(v0)
                     color.get(bb)
                     backgroundColor.get(bb)
-                    currentX += character.width * textScale
+                    currentX += character.advanceX * textScale
                     totalVertices += 6
                     charIndex++
                 }

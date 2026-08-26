@@ -38,7 +38,7 @@ fun Layout.text(
     updater: TextUpdater,
 ) {
     val stringWidth: Float = font.getStringWidth(string, scale)
-    val stringHeight: Float = font.getStringHeight(string, scale)
+    val stringHeight: Float = font.getStringHeight(scale)
     val text = Text(key, string, scale, font, color, updater, this)
     this.append(text)
     text.relativeX = x

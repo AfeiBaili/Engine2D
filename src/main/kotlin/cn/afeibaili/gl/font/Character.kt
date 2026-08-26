@@ -20,6 +20,6 @@ class Character(
     val width: Float,
     val height: Float,
     val bearingX: Float,
-    val bearingTop: Float,
-    val advance: Float,
+    val bearingY: Float,
+    val advanceX: Float,
 )

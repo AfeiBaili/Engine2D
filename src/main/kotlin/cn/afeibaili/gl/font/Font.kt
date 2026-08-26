@@ -27,17 +27,10 @@ class Font(
         var width = 0f
         string.forEach { char ->
             val character: Character = getChar(char) ?: return@forEach
-            width += character.width * scale
+            width += character.advanceX * scale
         }
         return width
     }
 
-    fun getStringHeight(string: String, scale: Float): Float {
-        var maxHeight = 0f
-        string.forEach { char ->
-            val character: Character = getChar(char) ?: return@forEach
-            if (maxHeight < character.height * scale) maxHeight = character.height * scale
-        }
-        return maxHeight
-    }
+    fun getStringHeight(scale: Float): Float = lineHeight * scale
 }
