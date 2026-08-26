@@ -74,7 +74,7 @@ class TextLayoutRenderer(
                 val currentY = text.absoluteY
                 val textScale = text.scale
                 text.string.forEach { char ->
-                    if (charIndex != 0 && charIndex % maxSize == 0) {
+                    if (charIndex >= maxSize) {
                         glUnmapNamedBuffer(vbo)
                         glDrawArrays(GL_TRIANGLES, 0, totalVertices)
                         bb.clear()

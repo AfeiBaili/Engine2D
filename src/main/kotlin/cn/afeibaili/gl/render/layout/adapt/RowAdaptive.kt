@@ -16,7 +16,7 @@ class RowAdaptive(override var container: Layout) : AbstractAdaptiveLayout() {
         for (item in items) {
             if (item is Layout) item.update()
             maxWidth = max(maxWidth, item.width)
-            item.relativeY = currentY
+            item.relativeY += currentY
             currentY += item.height
             height = currentY
         }

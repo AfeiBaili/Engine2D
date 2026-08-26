@@ -1,5 +1,6 @@
 package cn.afeibaili.gl
 
+import cn.afeibaili.gl.logger.LoggerFactory
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL45
@@ -20,14 +21,28 @@ class Window(
     var title: String,
     val windowLocation: Long,
     val clearColor: FloatArray,
+    vsync: Boolean,
 ) : Closeable {
+    private val logger = LoggerFactory.create("Window")
+    private var changeVsync: Boolean = vsync
+    var vsync: Boolean = vsync
+        set(value) {
+            changeVsync = true
+            field = value
+            logger.info("Window vsync change to $field")
+        }
 
     fun setViewport(width: Int, height: Int) {
         GL45C.glViewport(0, 0, width, height)
     }
 
-    inline fun frame(isActive: () -> Boolean, action: () -> Unit) {
+    fun loopFrame(isActive: () -> Boolean, action: () -> Unit) {
         while (isActive()) {
+            if (changeVsync) {
+                glfwSwapInterval(if (vsync) 1 else 0)
+                changeVsync = false
+            }
+
             GL45C.glClearBufferfv(GL45C.GL_COLOR, 0, clearColor)
             action()
             glfwSwapBuffers(windowLocation)
@@ -73,7 +88,7 @@ class WindowBuilder() {
         blocks.forEach { it() }
 
         isInitialised = true
-        return Window(width, height, title, window, clearColor)
+        return Window(width, height, title, window, clearColor, verticalSync)
     }
 
     fun withCustomBlock(block: () -> Unit): WindowBuilder {

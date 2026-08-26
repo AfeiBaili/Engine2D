@@ -17,7 +17,7 @@ class ColumnAdaptive(override var container: Layout) : AbstractAdaptiveLayout() 
         for (item in items) {
             if (item is Layout) item.update()
             maxHeight = max(maxHeight, item.height)
-            item.relativeX = currentX
+            item.relativeX += currentX
             currentX += item.width
             width = currentX
         }
