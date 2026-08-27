@@ -27,6 +27,7 @@ class LayoutRenderer(
     var updaters = mutableSetOf<TextUpdater>()
 
     private fun match(layout: Layout) {
+        if (!layout.showable) return
         for (component in layout.items) {
             if (component is Layout) {
                 layouts.add(component)
@@ -50,6 +51,13 @@ class LayoutRenderer(
     }
 
     fun update() {
+        textRenderer.clear()
+        rectRenderer.clear()
+        rectangles.clear()
+        updaters.clear()
+        layouts.clear()
+        match(rootLayout)
+
         updaters.forEach { textRenderer.upload(it) }
         layouts.forEach { rectRenderer.put(it.backgroundRect) }
         rectangles.forEach { (_, value) -> rectRenderer.put(value) }

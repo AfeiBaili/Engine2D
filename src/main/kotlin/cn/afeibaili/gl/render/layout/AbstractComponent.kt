@@ -27,6 +27,7 @@ abstract class AbstractComponent : Component {
     override var backgroundColor: Color = Color.NONE
     override var isMaxWidth: Boolean = false
     override var isMaxHeight: Boolean = false
+    override var showable: Boolean = true
 
     override fun toString(): String {
         return "${this::class.simpleName}(rx:$relativeX, ry:$relativeY, ax:$absoluteX, ay:$absoluteY, ox:$offsetX, oy:$offsetY, w:$width, h:$height, we:$weight, a:$align, bc:$backgroundColor, mw:$isMaxWidth, mh:$isMaxHeight)"

@@ -54,6 +54,10 @@ class TextLayoutRenderer(
         textSet.remove(updater)
     }
 
+    fun clear() {
+        textSet.clear()
+    }
+
     fun render() {
         if (textSet.isEmpty()) return
         var lastTexture: Texture? = null
@@ -66,6 +70,7 @@ class TextLayoutRenderer(
         var charIndex = 0
         textSet.forEach { updater ->
             updater.forEach { text ->
+                if (!text.showable) return@forEach
                 if (lastTexture == null || lastTexture != text.font.texture) {
                     text.font.texture.bind()
                     lastTexture = text.font.texture

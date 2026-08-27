@@ -36,7 +36,7 @@ fun Layout.text(
     color: Color = Color.WHITE,
     backgroundColor: Color = Color.NONE,
     updater: TextUpdater,
-) {
+): Text {
     val stringWidth: Float = font.getStringWidth(string, scale)
     val stringHeight: Float = font.getStringHeight(scale)
     val text = Text(key, string, scale, font, color, updater, this)
@@ -48,4 +48,5 @@ fun Layout.text(
     text.backgroundColor = backgroundColor
 
     updater.put(text)
+    return text
 }

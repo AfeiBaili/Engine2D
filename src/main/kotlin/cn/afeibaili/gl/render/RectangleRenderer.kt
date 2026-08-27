@@ -39,6 +39,10 @@ class RectangleRenderer(override val program: Program, override val camera: Came
         rectangleMap[rectangle.key] = rectangle
     }
 
+    fun clear() {
+        rectangleMap.clear()
+    }
+
     fun render() {
         if (rectangles.isEmpty()) return
         program.use()
@@ -48,7 +52,8 @@ class RectangleRenderer(override val program: Program, override val camera: Came
         bb.clear()
         var renderCount = 0
         rectangles.forEachIndexed { index, rectangle ->
-            if (index % 100 == 0 && index != 0) {
+            if (!rectangle.showable) return@forEachIndexed
+            if (index >= rectangleMaxSize) {
                 glUnmapNamedBuffer(vbo)
                 glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, renderCount)
                 bb.clear()
