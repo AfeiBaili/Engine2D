@@ -12,7 +12,8 @@ import org.joml.Matrix4f
  */
 
 class Camera(val program: Program, val projectionName: String = "projection", val viewName: String = "view") {
-    val projection: Matrix4f = Matrix4f().ortho(-5f, 5f, -5f, 5f, -1f, 1f)
+    val zoom = 10f
+    val projection: Matrix4f = Matrix4f().ortho(0f, zoom, 0f, zoom, -1f, 1f)
     val view = Matrix4f()
 
     fun scale(x: Float, y: Float, z: Float): Camera {
