@@ -2,7 +2,10 @@ package cn.afeibaili.gl.logger
 
 import cn.afeibaili.gl.logger.Logger.Companion.printDebug
 import cn.afeibaili.gl.logger.Logger.Companion.writeFile
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileWriter
 import java.io.PrintWriter
@@ -69,8 +72,6 @@ internal class LoggerImpl(override val name: String) : Logger {
                 outPrinter.close()
                 errPrinter.close()
                 filePrinter?.close()
-                outPrinter.println("logger is closed")
-                loggerScope.cancel()
             })
         }
     }
