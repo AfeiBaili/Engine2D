@@ -34,8 +34,8 @@ abstract class WorldRenderer(
         glNamedBufferStorage(
             instanceVbo, BLOCK_SIZE * 2L * Float.SIZE_BYTES, GL_DYNAMIC_STORAGE_BIT or GL_MAP_WRITE_BIT
         )
-        glVertexArrayVertexBuffer(vao, 1, instanceVbo, 0, 2 * Float.SIZE_BYTES)
-        glVertexArrayAttribFormat(vao, 1, 2, GL_FLOAT, false, 0)
+        glVertexArrayVertexBuffer(vao, 1, instanceVbo, 0, 2 * Int.SIZE_BYTES)
+        glVertexArrayAttribFormat(vao, 1, 2, GL_INT, false, 0)
         glVertexArrayAttribBinding(vao, 1, 1)
         glEnableVertexArrayAttrib(vao, 1)
         glVertexArrayBindingDivisor(vao, 1, 1)
