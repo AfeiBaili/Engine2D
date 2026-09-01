@@ -32,7 +32,7 @@ abstract class WorldRenderer(
         glEnableVertexArrayAttrib(vao, 0)
 
         glNamedBufferStorage(
-            instanceVbo, BLOCK_SIZE * 2L * Float.SIZE_BYTES, GL_DYNAMIC_STORAGE_BIT or GL_MAP_WRITE_BIT
+            instanceVbo, INSTANCE_SIZE_BYTE, GL_DYNAMIC_STORAGE_BIT or GL_MAP_WRITE_BIT
         )
         glVertexArrayVertexBuffer(vao, 1, instanceVbo, 0, 2 * Int.SIZE_BYTES)
         glVertexArrayAttribFormat(vao, 1, 2, GL_INT, false, 0)
@@ -41,7 +41,7 @@ abstract class WorldRenderer(
         glVertexArrayBindingDivisor(vao, 1, 1)
 
         glNamedBufferStorage(
-            uvVbo, BLOCK_SIZE * UV_SIZE.toLong() * Float.SIZE_BYTES, GL_DYNAMIC_STORAGE_BIT or GL_MAP_WRITE_BIT
+            uvVbo, UV_SIZE_BYTE, GL_DYNAMIC_STORAGE_BIT or GL_MAP_WRITE_BIT
         )
         glVertexArrayVertexBuffer(vao, 2, uvVbo, 0, UV_SIZE * Float.SIZE_BYTES)
         glVertexArrayAttribFormat(vao, 2, UV_SIZE, GL_FLOAT, false, 0)
@@ -50,29 +50,20 @@ abstract class WorldRenderer(
         glVertexArrayBindingDivisor(vao, 2, 1)
     }
 
-    fun getInstanceBuffer(): ByteBuffer? {
-        return glMapNamedBuffer(instanceVbo, GL_WRITE_ONLY)
+    fun uploadInstanceBuffer(buffer: ByteBuffer, offset: Long = 0L) {
+        glNamedBufferSubData(instanceVbo, offset, buffer)
     }
 
-    fun getUvBuffer(): ByteBuffer? {
-        return glMapNamedBuffer(uvVbo, GL_WRITE_ONLY)
-    }
-
-    fun putBuffer() {
-        glUnmapNamedBuffer(instanceVbo)
-        glUnmapNamedBuffer(uvVbo)
+    fun uploadUvBuffer(buffer: ByteBuffer, offset: Long = 0L) {
+        glNamedBufferSubData(uvVbo, offset, buffer)
     }
 
     /**
-     * ## 使用更新方法将数据存入至uv缓存和实例缓存
+     * ## 渲染实例数量
      *
-     * 获取实例和uv缓存需要调用`getInstanceBuffer()`和`getUvBuffer()`
-     *
-     * 随后调用`putBuffer()`方法上传数据至GPU
-     *
-     *  @return 实例数量
+     * @param instanceSize 实例数量
      */
-    fun renderBatch(instanceSize: Int) {
+    fun renderInstance(instanceSize: Int) {
         program.use()
         camera.apply()
         glBindVertexArray(vao)
@@ -90,6 +81,9 @@ abstract class WorldRenderer(
     companion object {
         const val UV_SIZE = 4
         const val BLOCK_SIZE = 1024 shl 4
+
+        const val INSTANCE_SIZE_BYTE = BLOCK_SIZE * 2L * Float.SIZE_BYTES
+        const val UV_SIZE_BYTE = BLOCK_SIZE * UV_SIZE.toLong() * Float.SIZE_BYTES
 
         val vertices = floatArrayOf(
             0f, 0f,
