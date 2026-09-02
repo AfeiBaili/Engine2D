@@ -20,7 +20,7 @@ class KeyBind(
 
 
     private var lastIsPressed = false
-    fun click(click: () -> Unit): Boolean {
+    fun released(click: () -> Unit): Boolean {
         if (lastIsPressed && keyReleased()) {
             click()
             lastIsPressed = false
