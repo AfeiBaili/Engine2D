@@ -15,18 +15,18 @@ class KeyBind(
     val key: Key, val window: Window,
 ) {
     fun getKeyMode(): Int = GLFW.glfwGetKey(window.windowLocation, key.glfwKey)
-    fun keyPress(): Boolean = GLFW.GLFW_PRESS == getKeyMode()
-    fun keyRelease(): Boolean = GLFW.GLFW_RELEASE == getKeyMode()
+    fun keyPressed(): Boolean = GLFW.GLFW_PRESS == getKeyMode()
+    fun keyReleased(): Boolean = GLFW.GLFW_RELEASE == getKeyMode()
 
 
     private var lastIsPressed = false
-    fun keyClick(click: () -> Unit): Boolean {
-        if (lastIsPressed && keyRelease()) {
+    fun click(click: () -> Unit): Boolean {
+        if (lastIsPressed && keyReleased()) {
             click()
             lastIsPressed = false
             return true
         }
-        lastIsPressed = keyPress()
+        lastIsPressed = keyPressed()
         return false
     }
 }
