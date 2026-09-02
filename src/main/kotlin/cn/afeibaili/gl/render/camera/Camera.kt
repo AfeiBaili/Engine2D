@@ -1,6 +1,5 @@
 package cn.afeibaili.gl.render.camera
 
-import cn.afeibaili.gl.render.setUniform
 import cn.afeibaili.gl.render.shader.Program
 import org.joml.Matrix4f
 
@@ -46,7 +45,7 @@ class Camera(val program: Program, val projectionName: String = "projection", va
     }
 
     fun uploadUniform(program: Program, projectionName: String = "projection", viewName: String = "view") {
-        setUniform(program, projectionName, m4f = projection)
-        setUniform(program, viewName, m4f = view)
+        program.setUniform(projectionName, m4f = projection)
+        program.setUniform(viewName, m4f = view)
     }
 }

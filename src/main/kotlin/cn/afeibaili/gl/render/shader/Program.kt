@@ -2,9 +2,12 @@ package cn.afeibaili.gl.render.shader
 
 import cn.afeibaili.gl.exception.ShaderException
 import cn.afeibaili.gl.logger.LoggerFactory
+import org.joml.Matrix4f
 import org.lwjgl.opengl.GL20C.GL_LINK_STATUS
 import org.lwjgl.opengl.GL45C
+import org.lwjgl.system.MemoryStack
 import java.io.Closeable
+import java.nio.FloatBuffer
 
 
 /**
@@ -31,6 +34,27 @@ class Program private constructor(val programLocation: Int, val shaders: Array<o
     fun use() {
         if (!isLinked) throw ShaderException("program is not linked")
         GL45C.glUseProgram(programLocation)
+    }
+
+    fun setUniform(
+        name: String,
+        f1: Float? = null,
+        i1: Int? = null,
+        m4f: Matrix4f? = null,
+    ) {
+        use()
+        val location: Int = GL45C.glGetUniformLocation(programLocation, name)
+        MemoryStack.stackPush().use { stack ->
+            when {
+                f1 != null -> GL45C.glUniform1f(location, f1)
+                i1 != null -> GL45C.glUniform1i(location, i1)
+                m4f != null -> {
+                    val data: FloatBuffer = stack.mallocFloat(4 * 4)
+                    m4f.get(data)
+                    GL45C.glUniformMatrix4fv(location, false, data)
+                }
+            }
+        }
     }
 
     override fun close() {
