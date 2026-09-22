@@ -14,7 +14,7 @@ import org.lwjgl.glfw.GLFW
 class KeyBind(
     val key: Key, val window: Window,
 ) {
-    fun getKeyMode(): Int = GLFW.glfwGetKey(window.windowLocation, key.glfwKey)
+    fun getKeyMode(): Int = GLFW.glfwGetKey(window.pointer, key.glfwKey)
     fun keyPressed(): Boolean = GLFW.GLFW_PRESS == getKeyMode()
     fun keyReleased(): Boolean = GLFW.GLFW_RELEASE == getKeyMode()
 

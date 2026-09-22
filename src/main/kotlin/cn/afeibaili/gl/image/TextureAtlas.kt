@@ -4,11 +4,7 @@ import cn.afeibaili.gl.exception.ImageException
 import cn.afeibaili.gl.exception.UnknownElementException
 import cn.afeibaili.gl.image.PreProcessImageInfo.Companion.transform
 import cn.afeibaili.gl.logger.LoggerFactory
-import cn.afeibaili.gl.util.Index
-import cn.afeibaili.gl.util.Side
-import cn.afeibaili.gl.util.Size
-import cn.afeibaili.gl.util.putElementOrCreateList
-import java.awt.Graphics
+import cn.afeibaili.gl.util.*
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
@@ -102,7 +98,7 @@ class TextureAtlas(val atlas: Map<Index, Atlas>, val extendPixel: Int) {
             atlasMap.forEach { (side, images) ->
                 images.forEach { image ->
                     image.indexImageList.forEach {
-                        it.image = extendSide(it.image, extendPixel)
+                        it.image = ImageUtil.extendSide(it.image, extendPixel)
                     }
                 }
             }
@@ -157,62 +153,6 @@ class TextureAtlas(val atlas: Map<Index, Atlas>, val extendPixel: Int) {
             val id: String = matchRegex.find(name)!!.groups[1]!!.value
             val index: Int = matchRegex.find(name)!!.groups[2]!!.value.toInt()
             return id to Index(index)
-        }
-
-        fun extendSide(sourceImage: BufferedImage, extendPixel: Int): BufferedImage {
-            val finalImage = BufferedImage(
-                sourceImage.width + (extendPixel shl 1),
-                sourceImage.height + (extendPixel shl 1),
-                BufferedImage.TYPE_INT_ARGB
-            )
-            // 绘制图片
-            val graphics: Graphics = finalImage.graphics
-            graphics.drawImage(sourceImage, extendPixel, extendPixel, null)
-            graphics.dispose()
-
-            // 根据扩展的像素循环扩展边缘
-            for (innerSide in 0 until extendPixel) {
-                val currentSide = extendPixel - innerSide
-                val rightSide = finalImage.width - currentSide - 1
-                val bottomSide = finalImage.height - currentSide - 1
-
-                val leftTopPoint: Int = // 左上点
-                    finalImage.getRGB(currentSide, currentSide)
-                val rightTopPoint: Int = // 右上点
-                    finalImage.getRGB(rightSide, currentSide)
-                val leftBottomPoint: Int = // 左下点
-                    finalImage.getRGB(currentSide, bottomSide)
-                val rightBottomPoint: Int =// 右下点
-                    finalImage.getRGB(rightSide, bottomSide)
-
-                val leftPoint = currentSide - 1
-                val topPoint = currentSide - 1
-                val rightPoint = finalImage.width - currentSide
-                val bottomPoint = finalImage.height - currentSide
-                finalImage.setRGB(leftPoint, topPoint, leftTopPoint)
-                finalImage.setRGB(rightPoint, topPoint, rightTopPoint)
-                finalImage.setRGB(leftPoint, bottomPoint, leftBottomPoint)
-                finalImage.setRGB(rightPoint, bottomPoint, rightBottomPoint)
-
-                // 左边
-                for (index in 0..finalImage.height - 1 - (currentSide shl 1)) finalImage.setRGB(
-                    leftPoint, index + currentSide, finalImage.getRGB(currentSide, index + currentSide)
-                )
-                // 右边
-                for (index in 0..finalImage.height - 1 - (currentSide shl 1)) finalImage.setRGB(
-                    rightPoint, index + currentSide, finalImage.getRGB(rightSide, index + currentSide)
-                )
-                // 顶边
-                for (index in 0..finalImage.width - 1 - (currentSide shl 1)) finalImage.setRGB(
-                    index + currentSide, topPoint, finalImage.getRGB(index + currentSide, currentSide)
-                )
-                // 底边
-                for (index in 0..finalImage.width - 1 - (currentSide shl 1)) finalImage.setRGB(
-                    index + currentSide, bottomPoint, finalImage.getRGB(index + currentSide, bottomSide)
-                )
-            }
-
-            return finalImage
         }
     }
 

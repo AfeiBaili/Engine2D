@@ -12,7 +12,7 @@ import org.lwjgl.glfw.GLFW
  */
 
 class MouseButtonBind(val mouseButton: MouseButton, val window: Window) {
-    fun getMouseButton() = GLFW.glfwGetMouseButton(window.windowLocation, mouseButton.glfwButton)
+    fun getMouseButton() = GLFW.glfwGetMouseButton(window.pointer, mouseButton.glfwButton)
     fun buttonPressed() = GLFW.GLFW_PRESS == getMouseButton()
     fun buttonReleased() = GLFW.GLFW_RELEASE == getMouseButton()
 

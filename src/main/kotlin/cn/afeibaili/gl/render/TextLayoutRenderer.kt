@@ -25,8 +25,8 @@ class TextLayoutRenderer(
     val vbo = glCreateBuffers()
     var showableBackground = false
 
-    // 一个字符 = 四个Float字节 + 四个背景色字节 + 四个颜色字节 * 六个顶点
-    private val bytePreChar = ((Float.SIZE_BYTES * 4) + 4 + 4) * 6
+    // 一个字符 = 两个坐标 + 两个uv + 四个背景色字节 + 四个颜色字节 * 六个顶点
+    private val bytePreChar = (Float.SIZE_BYTES * (2 + 2 + 4 + 4)) * 6
     private var maxSize = 1024
 
     init {

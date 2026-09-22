@@ -19,7 +19,7 @@ class Window(
     var width: Int,
     var height: Int,
     var title: String,
-    val windowLocation: Long,
+    val pointer: Long,
     val clearColor: FloatArray,
     vsync: Boolean,
 ) : Closeable {
@@ -45,13 +45,13 @@ class Window(
 
             GL45C.glClearBufferfv(GL45C.GL_COLOR, 0, clearColor)
             action()
-            glfwSwapBuffers(windowLocation)
+            glfwSwapBuffers(pointer)
             glfwPollEvents()
         }
     }
 
     override fun close() {
-        glfwDestroyWindow(windowLocation)
+        glfwDestroyWindow(pointer)
         glfwTerminate()
     }
 
@@ -60,7 +60,7 @@ class Window(
     }
 
     override fun toString(): String {
-        return "Window(width=$width, height=$height, title='$title', windowLocation=$windowLocation)"
+        return "Window(width=$width, height=$height, title='$title', windowLocation=$pointer)"
     }
 
 }
