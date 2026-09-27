@@ -2,6 +2,7 @@ package cn.afeibaili.gl.render
 
 import cn.afeibaili.gl.logger.LoggerFactory
 import cn.afeibaili.gl.render.layout.Layout
+import cn.afeibaili.gl.render.layout.image.Icon
 import cn.afeibaili.gl.render.layout.shape.Rectangle
 import cn.afeibaili.gl.render.layout.text.Text
 import cn.afeibaili.gl.render.layout.text.TextUpdater
@@ -17,6 +18,7 @@ import java.io.Closeable
 class LayoutRenderer(
     val textRenderer: TextLayoutRenderer,
     val rectRenderer: RectangleRenderer,
+    val imagRenderer: ImageRenderer,
     val rootLayout: Layout,
 ) :
     Closeable {
@@ -25,6 +27,7 @@ class LayoutRenderer(
     val rectangles = mutableMapOf<String, Rectangle>()
     val layouts = mutableListOf<Layout>()
     var updaters = mutableSetOf<TextUpdater>()
+    val icons = mutableSetOf<Icon>()
 
     private fun match(layout: Layout) {
         if (!layout.showable) return
@@ -35,6 +38,7 @@ class LayoutRenderer(
             } else when (component) {
                 is Rectangle -> rectangles[component.key] = component
                 is Text -> updaters.add(component.updater)
+                is Icon -> icons.add(component)
             }
         }
     }
@@ -42,6 +46,8 @@ class LayoutRenderer(
     fun init() {
         match(rootLayout)
         update()
+        imagRenderer.addImages(icons)
+        icons.forEach { logger.debug(it.image) }
         logger.debug("layouts size: ${layouts.size}")
         layouts.forEach { logger.debug(it) }
         logger.debug("rectangles size: ${rectangles.size}")
@@ -55,6 +61,7 @@ class LayoutRenderer(
         rectRenderer.clear()
         rectangles.clear()
         updaters.clear()
+        icons.clear()
         layouts.clear()
         match(rootLayout)
 
@@ -67,13 +74,16 @@ class LayoutRenderer(
     fun render() {
         rectRenderer.render()
         textRenderer.render()
+        imagRenderer.render()
     }
 
     override fun close() {
         rectangles.clear()
         layouts.clear()
         updaters.clear()
+        icons.clear()
         rectRenderer.close()
         textRenderer.close()
+        imagRenderer.close()
     }
 }

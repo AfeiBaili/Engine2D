@@ -1,6 +1,7 @@
 package cn.afeibaili.gl.render
 
 import cn.afeibaili.gl.image.Texture
+import cn.afeibaili.gl.image.atlas.Skyline
 import cn.afeibaili.gl.render.camera.Camera
 import cn.afeibaili.gl.render.layout.image.AbstractImageComponent
 import cn.afeibaili.gl.render.shader.Program
@@ -29,6 +30,7 @@ class ImageRenderer(
     val uvBuffer = BufferUtils.createByteBuffer(maxUvByteSize.toInt())
     val imageSet = mutableSetOf<AbstractImageComponent>()
     var texture: Texture? = null
+    val skyline = Skyline()
 
     init {
         //一个instanceVbo = 两个坐标 * 四个顶点
@@ -46,20 +48,23 @@ class ImageRenderer(
         glEnableVertexArrayAttrib(vao, 1)
     }
 
-
-    fun addImage(vararg image: AbstractImageComponent) {
-        for (component in image) {
+    fun addImages(images: Collection<AbstractImageComponent>) {
+        for (component in images) {
             imageSet.add(component)
+            skyline.add(component.image)
         }
         texture?.close()
-        texture = update(imageSet)
+        skyline.apply()
+        skyline.generateUv()
+        texture = skyline.toTexture()
         texture!!.upload()
-        uploadUvBuffer()
-        uploadInstanceBuffer()
+        updateImageUv()
+        updateImagePosition()
     }
 
     fun updateImagePosition() {
         var index = 0
+        instanceBuffer.clear()
         for (component in imageSet) {
             if (index >= maxSize) {
                 throw IllegalStateException("图片数量超过最大值: $index")
@@ -68,22 +73,24 @@ class ImageRenderer(
             val y0 = component.absoluteY
             val x1 = x0 + component.width
             val y1 = y0 + component.height
-            uvBuffer.putFloat(x0).putFloat(y0)
-            uvBuffer.putFloat(x1).putFloat(y0)
-            uvBuffer.putFloat(x1).putFloat(y1)
-            uvBuffer.putFloat(x0).putFloat(y1)
+            instanceBuffer.putFloat(x0).putFloat(y0)
+            instanceBuffer.putFloat(x1).putFloat(y0)
+            instanceBuffer.putFloat(x1).putFloat(y1)
+            instanceBuffer.putFloat(x0).putFloat(y1)
             index++
         }
+        instanceBuffer.flip()
         uploadInstanceBuffer()
     }
 
     fun updateImageUv() {
         var index = 0
+        uvBuffer.clear()
         for (component in imageSet) {
             if (index >= maxSize) {
                 throw IllegalStateException("图片数量超过最大值: $index")
             }
-            val uv: FloatArray = component.uv
+            val uv: FloatArray = component.image.uv
             val u0 = uv[0]
             val v0 = uv[1]
             val u1 = uv[2]
@@ -94,6 +101,7 @@ class ImageRenderer(
             uvBuffer.putFloat(u0).putFloat(v1)
             index++
         }
+        uvBuffer.flip()
         uploadUvBuffer()
     }
 
@@ -108,7 +116,7 @@ class ImageRenderer(
     fun render() {
         program.use()
         camera.apply()
-        texture?.bind()
+        texture!!.bind()
         glBindVertexArray(vao)
         glDrawArrays(GL_TRIANGLE_FAN, 0, imageSet.size * 4)
     }
@@ -119,11 +127,5 @@ class ImageRenderer(
         glDeleteBuffers(instanceVbo)
         glDeleteBuffers(uvVbo)
         glDeleteVertexArrays(vao)
-    }
-
-    companion object ImageAtlas {
-        fun update(imageSet: Set<AbstractImageComponent>): Texture {
-            TODO()
-        }
     }
 }

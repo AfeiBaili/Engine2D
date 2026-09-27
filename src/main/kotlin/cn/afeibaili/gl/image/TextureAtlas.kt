@@ -138,8 +138,7 @@ class TextureAtlas(val atlas: Map<Index, Atlas>, val extendPixel: Int) {
                 )
                 val atlasSize = "${atlasSide}x$atlasSide"
 
-                val writeFile = File("${System.getProperty("user.dir")}/temp/$textureId-$atlasSize.png")
-                ImageIO.write(atlasBufferImage, "png", writeFile)
+                TempFileUtil.createTempImageFile(atlasBufferImage, "$textureId-$atlasSize.png")
                 logger.info("make texture atlas, size: $atlasSize, size: ${images.size}")
             }
 

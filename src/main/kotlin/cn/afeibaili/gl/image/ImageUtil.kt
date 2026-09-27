@@ -1,4 +1,4 @@
-package cn.afeibaili.gl.util
+package cn.afeibaili.gl.image
 
 import java.awt.Graphics
 import java.awt.image.BufferedImage
@@ -15,6 +15,7 @@ object ImageUtil {
     }
 
     fun extendSide(sourceImage: BufferedImage, extendPixel: Int): BufferedImage {
+        //fixme
         val finalImage = BufferedImage(
             sourceImage.width + (extendPixel shl 1),
             sourceImage.height + (extendPixel shl 1),

@@ -2,13 +2,12 @@ package cn.afeibaili.gl.font
 
 import cn.afeibaili.gl.image.Texture
 import cn.afeibaili.gl.logger.LoggerFactory
+import cn.afeibaili.gl.util.TempFileUtil
 import cn.afeibaili.gl.util.memoryStack
 import org.lwjgl.PointerBuffer
 import org.lwjgl.util.freetype.*
 import java.awt.image.BufferedImage
-import java.io.File
 import java.nio.ByteBuffer
-import javax.imageio.ImageIO
 import kotlin.math.ceil
 import kotlin.math.sqrt
 
@@ -119,7 +118,7 @@ object FontFactory {
             )
             currentCellIndexX++
         }
-        ImageIO.write(image, "png", File("${System.getProperty("user.dir")}/temp/${fontName}.png"))
+        TempFileUtil.createTempImageFile(image, "${fontName}.png")
 
         return Font(fontName, filepath, defaultSize, ascent, descent, lineHeight, AsciiAtlas(charMap, Texture(image)))
     }
