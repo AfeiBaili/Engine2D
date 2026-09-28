@@ -24,23 +24,24 @@ class ImageRenderer(
     val instanceVbo = glCreateBuffers()
     val uvVbo = glCreateBuffers()
     val maxSize = 1024L
-    val maxInstanceByteSize = maxSize * 2 * 4 * Float.SIZE_BYTES
-    val maxUvByteSize = maxSize * 2 * 4 * Float.SIZE_BYTES
+    val maxInstanceByteSize = maxSize * 2 * 6 * Float.SIZE_BYTES
+    val maxUvByteSize = maxSize * 2 * 6 * Float.SIZE_BYTES
     val instanceBuffer = BufferUtils.createByteBuffer(maxInstanceByteSize.toInt())
     val uvBuffer = BufferUtils.createByteBuffer(maxUvByteSize.toInt())
     val imageSet = mutableSetOf<AbstractImageComponent>()
     var texture: Texture? = null
-    val skyline = Skyline()
+    val extendPixel = 1
+    val skyline = Skyline(extendPixel)
 
     init {
-        //一个instanceVbo = 两个坐标 * 四个顶点
+        //一个instanceVbo = 两个坐标 * 六个顶点
         glNamedBufferStorage(instanceVbo, maxInstanceByteSize, GL_DYNAMIC_STORAGE_BIT)
         glVertexArrayVertexBuffer(vao, 0, instanceVbo, 0, 2 * Float.SIZE_BYTES)
         glVertexArrayAttribFormat(vao, 0, 2, GL_FLOAT, false, 0)
         glVertexArrayAttribBinding(vao, 0, 0)
         glEnableVertexArrayAttrib(vao, 0)
 
-        //一个uvVbo = 两个uv * 四个顶点
+        //一个uvVbo = 两个uv * 六个顶点
         glNamedBufferStorage(uvVbo, maxUvByteSize, GL_DYNAMIC_STORAGE_BIT)
         glVertexArrayVertexBuffer(vao, 1, uvVbo, 0, 2 * Float.SIZE_BYTES)
         glVertexArrayAttribFormat(vao, 1, 2, GL_FLOAT, false, 0)
@@ -51,6 +52,7 @@ class ImageRenderer(
     fun addImages(images: Collection<AbstractImageComponent>) {
         for (component in images) {
             imageSet.add(component)
+            component.image.extendPixel(extendPixel)
             skyline.add(component.image)
         }
         texture?.close()
@@ -75,6 +77,8 @@ class ImageRenderer(
             val y1 = y0 + component.height
             instanceBuffer.putFloat(x0).putFloat(y0)
             instanceBuffer.putFloat(x1).putFloat(y0)
+            instanceBuffer.putFloat(x0).putFloat(y1)
+            instanceBuffer.putFloat(x1).putFloat(y0)
             instanceBuffer.putFloat(x1).putFloat(y1)
             instanceBuffer.putFloat(x0).putFloat(y1)
             index++
@@ -97,6 +101,8 @@ class ImageRenderer(
             val v1 = uv[3]
             uvBuffer.putFloat(u0).putFloat(v0)
             uvBuffer.putFloat(u1).putFloat(v0)
+            uvBuffer.putFloat(u0).putFloat(v1)
+            uvBuffer.putFloat(u1).putFloat(v0)
             uvBuffer.putFloat(u1).putFloat(v1)
             uvBuffer.putFloat(u0).putFloat(v1)
             index++
@@ -118,7 +124,7 @@ class ImageRenderer(
         camera.apply()
         texture!!.bind()
         glBindVertexArray(vao)
-        glDrawArrays(GL_TRIANGLE_FAN, 0, imageSet.size * 4)
+        glDrawArrays(GL_TRIANGLES, 0, imageSet.size * 6)
     }
 
     override fun close() {

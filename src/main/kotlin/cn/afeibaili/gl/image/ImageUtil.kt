@@ -15,7 +15,6 @@ object ImageUtil {
     }
 
     fun extendSide(sourceImage: BufferedImage, extendPixel: Int): BufferedImage {
-        //fixme
         val finalImage = BufferedImage(
             sourceImage.width + (extendPixel shl 1),
             sourceImage.height + (extendPixel shl 1),

@@ -14,7 +14,7 @@ import java.io.File
  * @version 2026/9/24 00:05
  */
 
-class Skyline {
+class Skyline(val extendPixel: Int = 0) {
     var boxWidth = 0
     var boxHeight = 0
     val images = mutableListOf<Image>()
@@ -35,6 +35,8 @@ class Skyline {
                 }
             }
             graphics.dispose()
+            val file: File = TempFileUtil.createTempImageFile(flipImage, "skyline.png")
+            logger.debug("create skyline atlas, file: ${file.absolutePath}")
             return Texture(flipImage)
         }
         val file: File = TempFileUtil.createTempImageFile(image, "skyline.png")
@@ -43,13 +45,12 @@ class Skyline {
     }
 
     fun generateUv() {
-        //fixme
         logger.debug("generate uv...")
         for (image in images) {
-            image.uv[0] = image.x.toFloat() / boxWidth.toFloat()
-            image.uv[1] = image.y.toFloat() / boxHeight.toFloat()
-            image.uv[2] = (image.x.toFloat() + image.width) / boxWidth.toFloat()
-            image.uv[3] = (image.y.toFloat() + image.height) / boxHeight.toFloat()
+            image.uv[0] = (image.x.toFloat() + extendPixel) / boxWidth.toFloat()
+            image.uv[1] = (image.y.toFloat() + extendPixel) / boxHeight.toFloat()
+            image.uv[2] = (image.x.toFloat() + image.width - (extendPixel * 2)) / boxWidth.toFloat()
+            image.uv[3] = (image.y.toFloat() + image.height - (extendPixel * 2)) / boxHeight.toFloat()
         }
     }
 

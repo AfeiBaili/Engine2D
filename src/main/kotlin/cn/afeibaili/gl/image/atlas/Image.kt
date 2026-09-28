@@ -13,8 +13,8 @@ import java.awt.image.BufferedImage
 class Image(val key: String, var image: BufferedImage) {
     var x: Int = 0
     var y: Int = 0
-    val width: Int = image.width
-    val height: Int = image.height
+    val width: Int get() = image.width
+    val height: Int get() = image.height
     val uv = FloatArray(4)
 
     fun extendPixel(extendPixelSize: Int) {
@@ -22,6 +22,6 @@ class Image(val key: String, var image: BufferedImage) {
     }
 
     override fun toString(): String {
-        return "Image(x=$x, y=$y, width=$width, height=$height, uv=${uv.contentToString()})"
+        return "Image(key=$key, x=$x, y=$y, width=$width, height=$height, uv=${uv.contentToString()})"
     }
 }
