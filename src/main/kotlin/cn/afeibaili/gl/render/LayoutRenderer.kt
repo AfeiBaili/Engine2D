@@ -65,6 +65,7 @@ class LayoutRenderer(
         layouts.clear()
         match(rootLayout)
 
+        imagRenderer.updateImagePosition()
         updaters.forEach { textRenderer.upload(it) }
         layouts.forEach { rectRenderer.put(it.backgroundRect) }
         rectangles.forEach { (_, value) -> rectRenderer.put(value) }
