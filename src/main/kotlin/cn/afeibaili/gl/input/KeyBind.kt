@@ -18,15 +18,24 @@ class KeyBind(
     fun keyPressed(): Boolean = GLFW.GLFW_PRESS == getKeyMode()
     fun keyReleased(): Boolean = GLFW.GLFW_RELEASE == getKeyMode()
 
-
     private var lastIsPressed = false
-    fun released(click: () -> Unit): Boolean {
+    fun released(click: () -> Unit) {
         if (lastIsPressed && keyReleased()) {
             click()
             lastIsPressed = false
-            return true
+            return
         }
         lastIsPressed = keyPressed()
-        return false
+    }
+
+    private var lastIsNotPressed = true
+    fun pressed(click: () -> Unit) {
+        if (lastIsNotPressed && keyPressed()) {
+            click()
+            lastIsNotPressed = false
+            return
+        }
+
+        lastIsNotPressed = keyReleased()
     }
 }
