@@ -1,5 +1,7 @@
 package cn.afeibaili.gl.image
 
+import cn.afeibaili.gl.image.atlas.DynamicImage
+import cn.afeibaili.gl.image.atlas.Image
 import java.awt.Graphics
 import java.awt.image.BufferedImage
 import java.io.File
@@ -13,6 +15,15 @@ object ImageUtil {
             throw IllegalArgumentException("无法读取图片数据: $filepath, 原因: ${it.message}")
         }
     }
+
+    fun Image.extendPixel(extendSize: Int) {
+        this.bufferedImage = extendSide(this.bufferedImage, extendSize)
+    }
+
+    fun DynamicImage.extendPixel(extendSize: Int) {
+        this.images.forEach { image -> image.extendPixel(extendSize) }
+    }
+
 
     fun extendSide(sourceImage: BufferedImage, extendPixel: Int): BufferedImage {
         val finalImage = BufferedImage(

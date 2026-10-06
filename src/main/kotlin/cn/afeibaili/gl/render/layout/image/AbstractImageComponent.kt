@@ -1,6 +1,5 @@
 package cn.afeibaili.gl.render.layout.image
 
-import cn.afeibaili.gl.image.atlas.Image
 import cn.afeibaili.gl.render.layout.AbstractComponent
 
 
@@ -11,4 +10,4 @@ import cn.afeibaili.gl.render.layout.AbstractComponent
  * @version 2026/9/3 18:58
  */
 
-abstract class AbstractImageComponent(val key: String, val image: Image) : AbstractComponent()
+abstract class AbstractImageComponent(val key: String, val updater: IconUpdater) : AbstractComponent()

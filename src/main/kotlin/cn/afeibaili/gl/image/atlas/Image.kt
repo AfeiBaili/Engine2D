@@ -1,6 +1,5 @@
 package cn.afeibaili.gl.image.atlas
 
-import cn.afeibaili.gl.image.ImageUtil
 import java.awt.image.BufferedImage
 
 /**
@@ -10,18 +9,10 @@ import java.awt.image.BufferedImage
  * @version 2026/9/25 19:18
  */
 
-class Image(val key: String, var image: BufferedImage) {
-    var x: Int = 0
-    var y: Int = 0
-    val width: Int get() = image.width
-    val height: Int get() = image.height
+class Image(val key: String, var bufferedImage: BufferedImage) {
+    var atlasX: Int = 0
+    var atlasY: Int = 0
+    val width: Int get() = bufferedImage.width
+    val height: Int get() = bufferedImage.height
     val uv = FloatArray(4)
-
-    fun extendPixel(extendPixelSize: Int) {
-        image = ImageUtil.extendSide(image, extendPixelSize)
-    }
-
-    override fun toString(): String {
-        return "Image(key=$key, x=$x, y=$y, width=$width, height=$height, uv=${uv.contentToString()})"
-    }
 }

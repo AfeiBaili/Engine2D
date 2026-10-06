@@ -3,6 +3,7 @@ package cn.afeibaili.gl.render
 import cn.afeibaili.gl.logger.LoggerFactory
 import cn.afeibaili.gl.render.layout.Layout
 import cn.afeibaili.gl.render.layout.image.Icon
+import cn.afeibaili.gl.render.layout.image.IconUpdater
 import cn.afeibaili.gl.render.layout.shape.Rectangle
 import cn.afeibaili.gl.render.layout.text.Text
 import cn.afeibaili.gl.render.layout.text.TextUpdater
@@ -18,7 +19,7 @@ import java.io.Closeable
 class LayoutRenderer(
     val textRenderer: TextLayoutRenderer,
     val rectRenderer: RectangleRenderer,
-    val imagRenderer: ImageRenderer,
+    val imageRenderer: ImageCollectionRenderer,
     val rootLayout: Layout,
 ) :
     Closeable {
@@ -26,8 +27,8 @@ class LayoutRenderer(
 
     val rectangles = mutableMapOf<String, Rectangle>()
     val layouts = mutableListOf<Layout>()
-    var updaters = mutableSetOf<TextUpdater>()
-    val icons = mutableSetOf<Icon>()
+    var texts = mutableSetOf<TextUpdater>()
+    val images = mutableSetOf<IconUpdater>()
 
     private fun match(layout: Layout) {
         if (!layout.showable) return
@@ -37,8 +38,8 @@ class LayoutRenderer(
                 match(component)
             } else when (component) {
                 is Rectangle -> rectangles[component.key] = component
-                is Text -> updaters.add(component.updater)
-                is Icon -> icons.add(component)
+                is Text -> texts.add(component.updater)
+                is Icon -> images.add(component.updater)
             }
         }
     }
@@ -46,45 +47,46 @@ class LayoutRenderer(
     fun init() {
         match(rootLayout)
         update()
-        imagRenderer.addImages(icons)
-        icons.forEach { logger.debug(it.image) }
+        imageRenderer.apply()
+        logger.debug("image updaters size: ${images.size}")
         logger.debug("layouts size: ${layouts.size}")
         layouts.forEach { logger.debug(it) }
         logger.debug("rectangles size: ${rectangles.size}")
         rectangles.forEach { (_, value) -> logger.debug(value) }
-        logger.debug("text size: ${updaters.sumOf { it.map.size }}")
-        updaters.forEach { it.map.values.forEach { it -> logger.debug(it) } }
+        logger.debug("text size: ${texts.sumOf { it.map.size }}")
+        texts.forEach { it.map.values.forEach { it -> logger.debug(it) } }
     }
 
     fun update() {
         textRenderer.clear()
         rectRenderer.clear()
         rectangles.clear()
-        updaters.clear()
-        icons.clear()
+        texts.clear()
+        images.clear()
         layouts.clear()
         match(rootLayout)
 
-        imagRenderer.updateImagePosition()
-        updaters.forEach { textRenderer.upload(it) }
+        images.forEach { imageRenderer.add(it) }
+        imageRenderer.updateImagePosition()
+        texts.forEach { textRenderer.add(it) }
         layouts.forEach { rectRenderer.put(it.backgroundRect) }
         rectangles.forEach { (_, value) -> rectRenderer.put(value) }
-        updaters.forEach { it.forEach { it -> rectRenderer.put(it.backgroundRect) } }
+        texts.forEach { it.forEach { it -> rectRenderer.put(it.backgroundRect) } }
     }
 
     fun render() {
         rectRenderer.render()
         textRenderer.render()
-        imagRenderer.render()
+        imageRenderer.render()
     }
 
     override fun close() {
         rectangles.clear()
         layouts.clear()
-        updaters.clear()
-        icons.clear()
+        texts.clear()
+        images.clear()
         rectRenderer.close()
         textRenderer.close()
-        imagRenderer.close()
+        imageRenderer.close()
     }
 }

@@ -1,5 +1,6 @@
 package cn.afeibaili.gl.image.atlas
 
+import cn.afeibaili.gl.image.ImageUtil.extendPixel
 import cn.afeibaili.gl.image.Texture
 import cn.afeibaili.gl.logger.LoggerFactory
 import cn.afeibaili.gl.util.TempFileUtil
@@ -14,17 +15,40 @@ import java.io.File
  * @version 2026/9/24 00:05
  */
 
-class Skyline(val extendPixel: Int = 0) {
+class Skyline(val extendPixel: Int = 0) : BigImageAtlas {
     var boxWidth = 0
     var boxHeight = 0
-    val images = mutableListOf<Image>()
+    override val images = mutableListOf<Image>()
+    override val imageMap = mutableMapOf<String, Image>()
     val lines = mutableListOf<Line>()
     private val logger = LoggerFactory.create("SkylineAtlas")
+
+        override fun toTexture() = toTexture(false)
+
+    override fun apply() {
+        boxWidth = 0
+        boxHeight = 0
+        lines.clear()
+        val sortedImage: List<Image> = images.sortedBy { -(it.width * it.height) }
+        images.clear()
+        imageMap.clear()
+        sortedImage.forEach { place(it) }
+    }
+
+    override fun generateUv() {
+        logger.debug("generate uv...")
+        for (image in images) {
+            image.uv[0] = (image.atlasX.toFloat() + extendPixel) / boxWidth.toFloat()
+            image.uv[1] = (image.atlasY.toFloat() + extendPixel) / boxHeight.toFloat()
+            image.uv[2] = (image.atlasX.toFloat() + image.width - (extendPixel * 2)) / boxWidth.toFloat()
+            image.uv[3] = (image.atlasY.toFloat() + image.height - (extendPixel * 2)) / boxHeight.toFloat()
+        }
+    }
 
     fun toTexture(flip: Boolean = false): Texture {
         val image = BufferedImage(boxWidth, boxHeight, BufferedImage.TYPE_INT_ARGB)
         val graphics = image.graphics
-        images.forEach { it -> graphics.drawImage(it.image, it.x, it.y, null) }
+        images.forEach { it -> graphics.drawImage(it.bufferedImage, it.atlasX, it.atlasY, null) }
 
         if (flip) {
             val flipImage = BufferedImage(boxWidth, boxHeight, BufferedImage.TYPE_INT_ARGB)
@@ -44,36 +68,23 @@ class Skyline(val extendPixel: Int = 0) {
         return Texture(image)
     }
 
-    fun generateUv() {
-        logger.debug("generate uv...")
-        for (image in images) {
-            image.uv[0] = (image.x.toFloat() + extendPixel) / boxWidth.toFloat()
-            image.uv[1] = (image.y.toFloat() + extendPixel) / boxHeight.toFloat()
-            image.uv[2] = (image.x.toFloat() + image.width - (extendPixel * 2)) / boxWidth.toFloat()
-            image.uv[3] = (image.y.toFloat() + image.height - (extendPixel * 2)) / boxHeight.toFloat()
-        }
-    }
-
     fun clear() {
         boxWidth = 0
         boxHeight = 0
         images.clear()
+        imageMap.clear()
         lines.clear()
     }
 
-    fun add(image: Image) = images.add(image)
-
-    fun apply() {
-        boxWidth = 0
-        boxHeight = 0
-        lines.clear()
-        val sortedImage: List<Image> = images.sortedBy { -(it.width * it.height) }
-        images.clear()
-        sortedImage.forEach { place(it) }
+    fun add(image: Image) {
+        images.add(image)
+        imageMap[image.key] = image
     }
 
     private fun place(image: Image) {
+        image.extendPixel(extendPixel)
         images.add(image)
+        imageMap[image.key] = image
 
         if (images.isEmpty()) {
             lines.add(Line(0, image.height, image.width))
@@ -177,8 +188,8 @@ class Skyline(val extendPixel: Int = 0) {
     }
 
     private fun setImage(x: Int, y: Int, image: Image) {
-        image.x = x
-        image.y = y
+        image.atlasX = x
+        image.atlasY = y
     }
 
 

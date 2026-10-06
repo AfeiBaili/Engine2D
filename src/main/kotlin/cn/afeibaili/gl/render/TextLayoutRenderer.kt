@@ -46,11 +46,11 @@ class TextLayoutRenderer(
         glEnableVertexArrayAttrib(vao, 3)
     }
 
-    fun upload(updater: TextUpdater) {
+    fun add(updater: TextUpdater) {
         textSet.add(updater)
     }
 
-    fun unload(updater: TextUpdater) {
+    fun remove(updater: TextUpdater) {
         textSet.remove(updater)
     }
 
