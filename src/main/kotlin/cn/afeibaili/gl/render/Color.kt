@@ -22,6 +22,10 @@ class Color(val red: UByte, val green: UByte, val blue: UByte, val alpha: UByte)
         buffer.put(getRed()).put(getGreen()).put(getBlue()).put(getAlpha())
     }
 
+    fun setAlpha(alpha: UByte): Color {
+        return Color(red, green, blue, alpha)
+    }
+
     companion object {
         val WHITE = parse("#FFFFFF")
         val BLACK = parse("#000000")
