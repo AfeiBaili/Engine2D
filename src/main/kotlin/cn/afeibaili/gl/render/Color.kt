@@ -22,8 +22,10 @@ class Color(val red: UByte, val green: UByte, val blue: UByte, val alpha: UByte)
         buffer.put(getRed()).put(getGreen()).put(getBlue()).put(getAlpha())
     }
 
-    fun setAlpha(alpha: UByte): Color {
-        return Color(red, green, blue, alpha)
+    fun setAlpha(alpha: Float): Color {
+        if (alpha !in 0f..1f) throw IllegalArgumentException("色值不在0-1之间: $alpha")
+        val a: UByte = lerp(alpha, UByte.MIN_VALUE.toInt(), UByte.MAX_VALUE.toInt())
+        return Color(red, green, blue, a)
     }
 
     companion object {
