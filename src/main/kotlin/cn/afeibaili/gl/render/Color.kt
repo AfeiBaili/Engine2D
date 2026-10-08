@@ -59,5 +59,10 @@ class Color(val red: UByte, val green: UByte, val blue: UByte, val alpha: UByte)
         private fun lerp(value: Float, min: Int, max: Int): UByte {
             return (min + value * (max - min)).toUInt().toUByte()
         }
+
+        fun ByteBuffer.putColor(color: Color): ByteBuffer {
+            color.get(this)
+            return this
+        }
     }
 }

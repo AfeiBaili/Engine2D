@@ -126,6 +126,7 @@ class ImageCollectionRenderer(
         camera.apply()
         texture!!.bind()
         updateImageUv()
+        updateImagePosition()
         glBindVertexArray(vao)
         glDrawArrays(GL_TRIANGLES, 0, updaters.sumOf { it.map.size } * 6)
     }

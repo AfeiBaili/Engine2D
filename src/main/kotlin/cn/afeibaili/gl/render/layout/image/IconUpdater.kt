@@ -1,6 +1,7 @@
 package cn.afeibaili.gl.render.layout.image
 
 import cn.afeibaili.gl.image.atlas.Image
+import cn.afeibaili.gl.render.layout.Updatable
 
 
 /**
@@ -10,23 +11,23 @@ import cn.afeibaili.gl.image.atlas.Image
  * @version 2026/10/4 22:44
  */
 
-class IconUpdater {
-    val map = mutableMapOf<String, Icon>()
+class IconUpdater : Updatable<Icon> {
+    override val map = mutableMapOf<String, Icon>()
 
-    fun put(icon: Icon) {
-        map.put(icon.key, icon)
+    fun put(value: Icon) {
+        map.put(value.key, value)
     }
 
-    fun update(key: String, image: Image) {
+    fun update(key: String, value: Image) {
         val icon: Icon? = map[key]
-        icon?.let { it.image = image }
+        icon?.let { it.image = value }
     }
 
     operator fun get(key: String): Icon? {
         return map[key]
     }
 
-    fun forEach(action: (Icon) -> Unit) {
-        map.values.forEach(action)
+    fun forEach(handler: (Icon) -> Unit) {
+        map.values.forEach(handler)
     }
 }

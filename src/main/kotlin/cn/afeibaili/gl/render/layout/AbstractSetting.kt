@@ -53,6 +53,11 @@ abstract class AbstractSetting<Setting : AbstractSetting<Setting>> {
         this.height = height
     }
 
+    fun size(value: Float) = case().apply {
+        this.width = value
+        this.height = value
+    }
+
     fun backgroundColor(color: Color) = case().apply {
         this.backgroundColor = color
     }

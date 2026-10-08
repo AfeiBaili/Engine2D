@@ -5,6 +5,7 @@ import cn.afeibaili.gl.render.layout.Layout
 import cn.afeibaili.gl.render.layout.image.Icon
 import cn.afeibaili.gl.render.layout.image.IconUpdater
 import cn.afeibaili.gl.render.layout.shape.Rectangle
+import cn.afeibaili.gl.render.layout.shape.border.BorderComponent
 import cn.afeibaili.gl.render.layout.text.Text
 import cn.afeibaili.gl.render.layout.text.TextUpdater
 import java.io.Closeable
@@ -20,6 +21,7 @@ class LayoutRenderer(
     val textRenderer: TextLayoutRenderer,
     val rectRenderer: RectangleRenderer,
     val imageRenderer: ImageCollectionRenderer,
+    val borderRenderer: BorderRenderer,
     val rootLayout: Layout,
 ) :
     Closeable {
@@ -29,6 +31,7 @@ class LayoutRenderer(
     val layouts = mutableListOf<Layout>()
     var texts = mutableSetOf<TextUpdater>()
     val images = mutableSetOf<IconUpdater>()
+    val borders = mutableSetOf<BorderComponent>()
 
     private fun match(layout: Layout) {
         if (!layout.showable) return
@@ -40,6 +43,7 @@ class LayoutRenderer(
                 is Rectangle -> rectangles[component.key] = component
                 is Text -> texts.add(component.updater)
                 is Icon -> images.add(component.updater)
+                is BorderComponent -> borders.add(component)
             }
         }
     }
@@ -48,6 +52,7 @@ class LayoutRenderer(
         match(rootLayout)
         update()
         imageRenderer.apply()
+        logger.debug("borders size: ${borders.size}")
         logger.debug("image updaters size: ${images.size}")
         logger.debug("layouts size: ${layouts.size}")
         layouts.forEach { logger.debug(it) }
@@ -61,13 +66,15 @@ class LayoutRenderer(
         textRenderer.clear()
         rectRenderer.clear()
         rectangles.clear()
+        borderRenderer.clear()
         texts.clear()
         images.clear()
         layouts.clear()
+        borders.clear()
         match(rootLayout)
 
+        borders.forEach { borderRenderer.add(it) }
         images.forEach { imageRenderer.add(it) }
-        imageRenderer.updateImagePosition()
         texts.forEach { textRenderer.add(it) }
         layouts.forEach { rectRenderer.put(it.backgroundRect) }
         rectangles.forEach { (_, value) -> rectRenderer.put(value) }
@@ -78,6 +85,7 @@ class LayoutRenderer(
         rectRenderer.render()
         textRenderer.render()
         imageRenderer.render()
+        borderRenderer.render()
     }
 
     override fun close() {
