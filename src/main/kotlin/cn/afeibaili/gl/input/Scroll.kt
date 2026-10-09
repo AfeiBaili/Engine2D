@@ -8,6 +8,9 @@ package cn.afeibaili.gl.input
  * @version 2026/10/9 09:40
  */
 
-class Scroll(val id: String, val value: Double) {
-
-}
+class Scroll(
+    val id: String, val value: Double,
+    val alt: Boolean = false,
+    val ctrl: Boolean = false,
+    val shift: Boolean = false,
+)
