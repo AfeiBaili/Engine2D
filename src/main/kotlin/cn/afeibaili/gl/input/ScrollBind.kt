@@ -11,34 +11,37 @@ import cn.afeibaili.gl.Window
  */
 
 class ScrollBind(val scroll: Scroll, val window: Window) {
-    var xv = scroll.value
-    var yv = scroll.value
+    var dv = 0.0
+    var uv = 0.0
+    var lv = 0.0
+    var rv = 0.0
+
     val value: Double get() = scroll.value
 
     fun down(action: () -> Unit) {
-        while (yv > value) {
-            yv -= value
+        while (dv >= value) {
+            dv -= value
             action()
         }
     }
 
     fun up(action: () -> Unit) {
-        while (yv < value) {
-            yv += value
+        while (uv >= value) {
+            uv -= value
             action()
         }
     }
 
     fun left(action: () -> Unit) {
-        while (xv < value) {
-            xv += value
+        while (lv >= value) {
+            lv -= value
             action()
         }
     }
 
     fun right(action: () -> Unit) {
-        while (xv > value) {
-            xv -= value
+        while (rv >= value) {
+            rv -= value
             action()
         }
     }
