@@ -80,7 +80,9 @@ abstract class WorldRenderer(
 
     companion object {
         const val UV_SIZE = 4
-        const val BLOCK_SIZE = 1024 shl 4
+
+        // 区块大小
+        const val BLOCK_SIZE = (16 * 16) shl 4
 
         const val INSTANCE_SIZE_BYTE = BLOCK_SIZE * 2L * Float.SIZE_BYTES
         const val UV_SIZE_BYTE = BLOCK_SIZE * UV_SIZE.toLong() * Float.SIZE_BYTES

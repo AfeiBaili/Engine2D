@@ -36,7 +36,7 @@ class Skyline(override val key: String, val extendPixel: Int = 0) : BigImageAtla
     }
 
     override fun generateUv() {
-        logger.debug("generate uv...")
+        logger.debug("$key generate uv...")
         for (image in images) {
             image.uv[0] = (image.atlasX.toFloat() + extendPixel) / boxWidth.toFloat()
             image.uv[1] = (image.atlasY.toFloat() + extendPixel) / boxHeight.toFloat()
@@ -63,7 +63,7 @@ class Skyline(override val key: String, val extendPixel: Int = 0) : BigImageAtla
             logger.debug("create skyline atlas, file: ${file.absolutePath}")
             return Texture(flipImage)
         }
-        val file: File = TempFileUtil.createTempImageFile(image, "skyline.png")
+        val file: File = TempFileUtil.createTempImageFile(image, "${key}-skyline.png")
         logger.debug("create skyline atlas, file: ${file.absolutePath}")
         return Texture(image)
     }
