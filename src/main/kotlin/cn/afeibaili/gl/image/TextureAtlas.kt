@@ -13,18 +13,20 @@ import kotlin.math.sqrt
 
 
 /**
- * # 纹理图集
+ * # 纹理图集 (已弃用, 现使用BigImageAtlas)
  *
  * 图集中可能包含动态纹理，动态纹理由 `Atlas` index来管理
  *
  * @param atlas 可能为不同大小的纹理集
  * @param extendPixel 扩展的像素大小
  * @see Atlas
+ * @see cn.afeibaili.gl.image.atlas.BigImageAtlas
  *
  * @author AfeiBaili
  * @version 2026/6/4 20:55
  */
 
+@Deprecated("已弃用, 现使用BigImageAtlas")
 class TextureAtlas(val atlas: Map<Index, Atlas>, val extendPixel: Int) {
     companion object {
         private val logger = LoggerFactory.create("TextureAtlas")
@@ -192,3 +194,48 @@ class TextureAtlas(val atlas: Map<Index, Atlas>, val extendPixel: Int) {
 
     fun getAtlas(id: String): Atlas? = atlas.values.find { it.textureNameMap[id] != null }
 }
+
+
+/**
+ * # 预处理图片，可能是动态的
+ *
+ * 动态，静态预处理类
+ */
+internal class PreProcessImageSet(val name: String, val indexImageList: List<PreProcessImageInfo>)
+
+internal class PreProcessImageInfo(val index: Index, val side: Side, var image: BufferedImage) {
+    companion object {
+        fun Triple<Index, BufferedImage, Side>.transform(): PreProcessImageInfo {
+            return PreProcessImageInfo(first, third, second)
+        }
+    }
+}
+
+
+/**
+ * # 图集
+ *
+ * 包含所有纹理信息的纹理图集，其中纹理的大小都是相同的。
+ *
+ * @param atlasId 图集id用来区分图集，使用索引规则
+ * @param bufferedImage 图片信息
+ * @param textureNameMap 纹理id和索引信息，可能有多个索引（动态纹理）
+ * @param textureSize 此图集包含的纹理数量
+ * @param textureSide 纹理边长
+ * @param atlasSide 此图集的边长
+ * @param texture 纹理类，由OpenGL管理
+ * @param rowLength 行纹理数量
+ *
+ * @author AfeiBaili
+ */
+
+data class Atlas(
+    val atlasId: Index,                             // 图集id
+    val bufferedImage: BufferedImage,               // 图集缓存
+    val textureNameMap: Map<String, List<Index>>,   // 纹理名称映射
+    val textureSize: Size,                          // 纹理数量
+    val textureSide: Side,                          // 纹理边长
+    val atlasSide: Side,                            // 图集边长
+    val texture: Texture,                           // 纹理实例
+    val rowLength: Int,                             // 行数量
+)

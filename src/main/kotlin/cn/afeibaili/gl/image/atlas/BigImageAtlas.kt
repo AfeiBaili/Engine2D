@@ -11,6 +11,7 @@ import cn.afeibaili.gl.image.Texture
  */
 
 interface BigImageAtlas {
+    val key: String
     val images: List<Image>
     val imageMap: Map<String, Image>
     fun apply()

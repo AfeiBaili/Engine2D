@@ -15,7 +15,7 @@ import java.io.File
  * @version 2026/9/24 00:05
  */
 
-class Skyline(val extendPixel: Int = 0) : BigImageAtlas {
+class Skyline(override val key: String, val extendPixel: Int = 0) : BigImageAtlas {
     var boxWidth = 0
     var boxHeight = 0
     override val images = mutableListOf<Image>()
@@ -23,7 +23,7 @@ class Skyline(val extendPixel: Int = 0) : BigImageAtlas {
     val lines = mutableListOf<Line>()
     private val logger = LoggerFactory.create("SkylineAtlas")
 
-        override fun toTexture() = toTexture(false)
+    override fun toTexture() = toTexture(false)
 
     override fun apply() {
         boxWidth = 0
@@ -59,7 +59,7 @@ class Skyline(val extendPixel: Int = 0) : BigImageAtlas {
                 }
             }
             graphics.dispose()
-            val file: File = TempFileUtil.createTempImageFile(flipImage, "skyline.png")
+            val file: File = TempFileUtil.createTempImageFile(flipImage, "${key}-skyline.png")
             logger.debug("create skyline atlas, file: ${file.absolutePath}")
             return Texture(flipImage)
         }

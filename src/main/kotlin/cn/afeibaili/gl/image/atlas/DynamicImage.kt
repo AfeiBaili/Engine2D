@@ -41,4 +41,8 @@ class DynamicImage(val key: String, val switchMillisInternal: Int, var images: A
             changed = true
         }
     }
+
+    fun getUvs(): List<FloatArray> {
+        return images.map { it.uv }
+    }
 }
