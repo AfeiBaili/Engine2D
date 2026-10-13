@@ -18,6 +18,10 @@ class KeyBind(
     fun keyPressed(): Boolean = GLFW.GLFW_PRESS == getKeyMode()
     fun keyReleased(): Boolean = GLFW.GLFW_RELEASE == getKeyMode()
 
+    fun getIsPressAlt() = GLFW.glfwGetKey(window.pointer, GLFW.GLFW_KEY_LEFT_ALT) == GLFW.GLFW_PRESS
+    fun getIsPressCtrl() = GLFW.glfwGetKey(window.pointer, GLFW.GLFW_KEY_LEFT_CONTROL) == GLFW.GLFW_PRESS
+    fun getIsPressShift() = GLFW.glfwGetKey(window.pointer, GLFW.GLFW_KEY_LEFT_SHIFT) == GLFW.GLFW_PRESS
+
     private var lastIsPressed = false
     fun released(click: () -> Unit) {
         if (lastIsPressed && keyReleased()) {

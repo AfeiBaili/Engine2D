@@ -8,4 +8,10 @@ package cn.afeibaili.gl.input
  * @version 2026/9/2 12:17
  */
 
-class MouseButton(val id: String, val glfwButton: Int)
+class MouseButton(
+    val id: String,
+    val glfwButton: Int,
+    val alt: Boolean = false,
+    val ctrl: Boolean = false,
+    val shift: Boolean = false,
+)

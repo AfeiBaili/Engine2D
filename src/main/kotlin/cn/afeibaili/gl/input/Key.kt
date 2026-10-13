@@ -8,4 +8,9 @@ package cn.afeibaili.gl.input
  * @version 2026/6/17 21:19
  */
 
-class Key(val id: String, val glfwKey: Int)
+class Key(
+    val id: String, val glfwKey: Int,
+    val alt: Boolean = false,
+    val ctrl: Boolean = false,
+    val shift: Boolean = false,
+)
