@@ -23,10 +23,12 @@ class Camera(val program: Program, val projectionName: String = "projection", va
     private var bottom = 0f
     private var top = 0f
     private var rotate = 0f
+    private var aspect = 0f
 
     // VIEW ////
-    fun scale(scale: Float): Camera {
+    fun scale(scale: Float, aspect: Float = 1f): Camera {
         this.scale = scale
+        this.aspect = aspect
         return this
     }
 
@@ -42,7 +44,7 @@ class Camera(val program: Program, val projectionName: String = "projection", va
     }
 
     fun updateView() {
-        val centerX = zoom / 2f
+        val centerX = zoom * aspect / 2f
         val centerY = zoom / 2f
 
         view.identity()
